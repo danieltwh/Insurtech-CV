@@ -1,4 +1,4 @@
-Fintech Society ML - Insurtech Computer Vision
+# Fintech Society ML - Insurtech Computer Vision
 
 ## Installation
 
