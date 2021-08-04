@@ -6,5 +6,7 @@
 
 2. Activate the VE ```conda activate mlvc```
 
-3. Installing the necessary dependencies ```pip install -r requirements.txt```
+3. Enter the Mask_RCNN directory ```cd Mask_RCNN```
+
+4. Install the necessary dependencies ```pip install -r requirements.txt```
 
