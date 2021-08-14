@@ -2,7 +2,7 @@
 
 ## Installation
 
-1. Creating a new virtual environment using conda ```conda create -n mlvc python=3.8```
+1. Creating a new virtual environment using conda ```conda create -n mlvc python=3.7```
 
 2. Activate the VE ```conda activate mlvc```
 
