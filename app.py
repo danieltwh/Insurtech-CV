@@ -29,7 +29,9 @@ def allowed_file(filename):
 def home():
     return render_template('index.html')
 
-
+# This implementation requires a server
+# An alternative is using data uri, not sure how to make it work with model predict:
+# https://buraksenol.medium.com/pass-images-to-html-without-saving-them-as-files-using-python-flask-b055f29908a
 @app.route('/', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
