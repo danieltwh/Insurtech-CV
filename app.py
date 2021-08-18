@@ -1,6 +1,13 @@
-from flask import Flask, flash, request, redirect, url_for, render_template
+# Root directory of the project
 import os
+import sys
+from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
+# Import Mask RCNN
+ROOT_DIR = os.path.abspath("./Mask_RCNN")
+
+sys.path.append(ROOT_DIR)  # To find local version of the library
+from mrcnn.model import MaskRCNN
 
 app = Flask(__name__)
 
