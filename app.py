@@ -1,5 +1,4 @@
 # Root directory of the project
-from mrcnn.model import MaskRCNN
 import os
 import sys
 import base64
@@ -7,15 +6,17 @@ from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 # Import Mask RCNN
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
-
 sys.path.append(ROOT_DIR)  # To find local version of the library
+
+HOME_TEMPLATE = 'index.html'
+ABOUT_TEMPLATE = 'about.html'
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def home():
-    return render_template('testing.html')
+    return render_template(HOME_TEMPLATE)
 
 
 @app.route('/', methods=['POST'])
@@ -30,10 +31,15 @@ def upload_image():
     if file:
         filename = secure_filename(file.filename)
         image_string = base64.b64encode(file.stream.read())
-        print('upload_image filename: ' + filename)
-        return render_template('testing.html', filename=filename)
+        # model.predict(image_string)
+        return render_template(HOME_TEMPLATE, filename=filename)
     else:
         return redirect(request.url)
+
+
+@app.route('/about')
+def about():
+    return render_template(ABOUT_TEMPLATE)
 
 
 if __name__ == "__main__":
