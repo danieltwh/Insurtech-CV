@@ -74,17 +74,22 @@ def model_predict(image, model, cfg):
 # test_set.prepare()
 # print('Test: %d' % len(test_set.image_ids))
 
-# create config
-cfg = PredictionConfig()
-# define the model
-model = MaskRCNN(mode='inference', model_dir='./', config=cfg)
+def init_model():
+    # create config
+    cfg = PredictionConfig()
+    # define the model
+    model = MaskRCNN(mode='inference', model_dir='./', config=cfg)
+    return cfg, model
 
-# Loading the COCO weights
-COCO_WEIGHTS_PATH = "./mask_rcnn_damage_0010.h5"
+def load_weights(model, path):
+    # Loading the COCO weights
+    model.load_weights(path, by_name=True)
 
-model.load_weights(COCO_WEIGHTS_PATH, by_name=True)
+cfg, model = init_model()
+COCO_WEIGHTS_PATH = os.path.join('')
+load_weights(model,COCO_WEIGHTS_PATH)
 
-output = model_predict(input_image,model,cfg) # Outputs predicted image
+output = model_predict(input_image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
 
 # # evaluate model on training dataset
 # train_mAP = evaluate_model(train_set, model, cfg)
