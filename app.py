@@ -2,11 +2,9 @@
 import os
 import sys
 import base64
+from Notebook.inference import model_predict
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
-# Import Mask RCNN
-ROOT_DIR = os.path.abspath("./Mask_RCNN")
-sys.path.append(ROOT_DIR)  # To find local version of the library
 
 HOME_TEMPLATE = 'index.html'
 ABOUT_TEMPLATE = 'about.html'
@@ -31,7 +29,7 @@ def upload_image():
     if file:
         filename = secure_filename(file.filename)
         image_string = base64.b64encode(file.stream.read())
-        # model.predict(image_string)
+        print(model_predict(image_string))
         return render_template(HOME_TEMPLATE, filename=filename)
     else:
         return redirect(request.url)
