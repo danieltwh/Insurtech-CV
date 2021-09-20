@@ -1,73 +1,137 @@
 # Root directory of the project
 import os
 import sys
+import base64
+from io import BytesIO
+from PIL import Image
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
-# Import Mask RCNN
-ROOT_DIR = os.path.abspath("./Mask_RCNN")
 
+import json
+import datetime
+import numpy as np
+import pandas as pd
+# import skimage.draw
+import matplotlib.pyplot as plt
+import keras
+
+# # Import Mask RCNN
+ROOT_DIR = os.path.abspath("./Mask_RCNN")
 sys.path.append(ROOT_DIR)  # To find local version of the library
+
+from os import listdir
+from xml.etree import ElementTree
+from numpy import zeros
+from numpy import asarray
+from numpy import expand_dims
+from numpy import mean
+from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
+from mrcnn.utils import Dataset
+from mrcnn.utils import compute_ap
+from mrcnn.model import load_image_gt
+from mrcnn.model import mold_image
+from mrcnn.visualize import display_instances
+from mrcnn.utils import extract_bboxes
+
+# from Notebook.inference import PredictionConfig, model_predict, init_model, load_weights
+
+# # Import Mask RCNN
+ROOT_DIR = os.path.abspath("./Mask_RCNN")
+sys.path.append(ROOT_DIR)  # To find local version of the library
+
+HOME_TEMPLATE = 'index.html'
+ABOUT_TEMPLATE = 'about.html'
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'static/uploads/'
 
-app.secret_key = "secret key"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# Set max file size
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+class PredictionConfig(Config):
+	# define the name of the configuration
+	NAME = "damage_cfg"
+	# number of classes (background + kangaroo)
+	NUM_CLASSES = 1 + 2
+	# simplify GPU config
+	GPU_COUNT = 1
+	IMAGES_PER_GPU = 1
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+def model_predict(image, model, cfg):
+    class_names = ['BG', 'scratches', 'dents']
+    # load image, bounding boxes and masks for the image id
+    # image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(dataset, cfg, image_id, use_mini_mask=False)
+    # convert pixel values (e.g. center)
+    scaled_image = mold_image(image, cfg)
+    # convert image into one sample
+    sample = expand_dims(scaled_image, 0)
+    # make prediction
+    yhat = model.detect(sample, verbose=0)
+    # extract results for first sample
+    r = yhat[0]
+    # Getting predicted values from r
+    pred_class_id = r['class_ids']
+    pred_mask = r['masks']
+    pred_bbox = extract_bboxes(pred_mask)
+    # display predicted image with masks and bounding boxes
+    display_instances(image, pred_bbox, pred_mask, pred_class_id, class_names , scores=r['scores'], title='Predicted')
+    return r
 
+# # load the train dataset
+# train_set = CustomDataset()
+# train_set.load_custom('./dataset_train1', 'train')
+# train_set.prepare()
+# print('Train: %d' % len(train_set.image_ids))
 
-def listToString(list):
-    str1 = ""
-    for ele in list:
-        str1 = str1 + " " + ele
-    return str1
+# # load the test dataset
+# test_set = CustomDataset()
+# test_set.load_custom('./dataset_train1', 'val')
+# test_set.prepare()
+# print('Test: %d' % len(test_set.image_ids))
 
+def init_model():
+    # create config
+    cfg = PredictionConfig()
+    # define the model
+    model = MaskRCNN(mode='inference', model_dir='./', config=cfg)
+    return cfg, model
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def load_weights(model, path):
+    # Loading the COCO weights
+    model.load_weights(path, by_name=True)
+
+cfg, model = init_model()
+WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
+load_weights(model,WEIGHTS_PATH)
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template(HOME_TEMPLATE)
 
-# This implementation requires a server
-# An alternative is using data uri, not sure how to make it work with model predict:
-# https://buraksenol.medium.com/pass-images-to-html-without-saving-them-as-files-using-python-flask-b055f29908a
+
 @app.route('/', methods=['POST'])
 def upload_image():
     if 'file' not in request.files:
-        flash('No file part')
+        print('No file part')
         return redirect(request.url)
     file = request.files['file']
     if file.filename == '':
-        flash('No image selected')
+        print('No image selected')
         return redirect(request.url)
-    if file and allowed_file(file.filename):
+    if file:
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        #print('upload_image filename: ' + filename)
-        return render_template('index.html', filename=filename)
+        image_string = base64.b64encode(file.stream.read())
+        # image = Image.open(BytesIO(image_string))
+        # model.predict(image_string)
+        # output = model_predict(image_string,model,cfg)
+        # print(output["class_ids"])
+        return render_template(HOME_TEMPLATE, filename=filename, pred = output['class_ids'])
     else:
-        flash('Allowed image types are -' + listToString(ALLOWED_EXTENSIONS))
         return redirect(request.url)
 
 
-@app.route('/display/<filename>')
-def display_image(filename):
-    #print('display_image filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/' + filename), code=301)
-
-
-@app.errorhandler(413)
-def request_entity_too_large(error):
-    flash('File size must be below 16MB')
-    return redirect(request.url)
+@app.route('/about')
+def about():
+    return render_template(ABOUT_TEMPLATE)
 
 
 if __name__ == "__main__":

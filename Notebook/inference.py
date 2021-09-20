@@ -4,7 +4,7 @@ import json
 import datetime
 import numpy as np
 import pandas as pd
-import skimage.draw
+# import skimage.draw
 import matplotlib.pyplot as plt
 import keras
 import tensorflow as tf
