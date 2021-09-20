@@ -7,6 +7,7 @@ import pandas as pd
 import skimage.draw
 import matplotlib.pyplot as plt
 import keras
+import tensorflow as tf
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../Mask_RCNN")
@@ -27,6 +28,9 @@ from mrcnn.model import load_image_gt
 from mrcnn.model import mold_image
 from mrcnn.visualize import display_instances
 from mrcnn.utils import extract_bboxes
+from mrcnn.utils import resize_image
+from skimage.io import imread
+from PIL import Image
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
@@ -85,11 +89,29 @@ def load_weights(model, path):
     # Loading the COCO weights
     model.load_weights(path, by_name=True)
 
+def resize_image_array(img_arr):
+    image, window, scale, padding, crop = resize_image(
+      img_arr,
+      min_dim=cfg.IMAGE_MIN_DIM,
+      min_scale=cfg.IMAGE_MIN_SCALE,
+      max_dim=cfg.IMAGE_MAX_DIM,
+      mode=cfg.IMAGE_RESIZE_MODE)
+    return image
+
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = os.path.join('')
+# Just for testing getting image as array from path
+imagedata=imread('./dataset_train2/train/car1.jpg')
+imgdata = imagedata.copy()
+# Here imgdata should be the image as array and will be resized to fit the model's image size requirements
+image = resize_image_array(imgdata) 
+COCO_WEIGHTS_PATH = './mask_rcnn_damage_0040.h5'
 load_weights(model,COCO_WEIGHTS_PATH)
 
-output = model_predict(input_image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+output = model_predict(image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+
+pred_class_id = output['class_ids']
+pred_mask = output['masks']
+pred_bbox = extract_bboxes(pred_mask)
 
 # # evaluate model on training dataset
 # train_mAP = evaluate_model(train_set, model, cfg)
@@ -98,3 +120,4 @@ output = model_predict(input_image,model,cfg) # Outputs a dictionary which conta
 # # evaluate model on test dataset
 # test_mAP = evaluate_model(test_set, model, cfg)
 # print("Test mAP: %.3f" % test_mAP)
+
