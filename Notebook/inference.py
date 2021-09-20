@@ -4,7 +4,7 @@ import json
 import datetime
 import numpy as np
 import pandas as pd
-import skimage.draw
+# import skimage.draw
 import matplotlib.pyplot as plt
 import keras
 
@@ -85,11 +85,11 @@ def load_weights(model, path):
     # Loading the COCO weights
     model.load_weights(path, by_name=True)
 
-cfg, model = init_model()
-COCO_WEIGHTS_PATH = os.path.join('')
-load_weights(model,COCO_WEIGHTS_PATH)
+# cfg, model = init_model()
+# COCO_WEIGHTS_PATH = "mask_rcnn_damage_0010.h5"
+# load_weights(model,COCO_WEIGHTS_PATH)
 
-output = model_predict(input_image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+# output = model_predict(input_image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
 
 # # evaluate model on training dataset
 # train_mAP = evaluate_model(train_set, model, cfg)
