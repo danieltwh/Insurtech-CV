@@ -113,11 +113,3 @@ pred_class_id = output['class_ids']
 pred_mask = output['masks']
 pred_bbox = extract_bboxes(pred_mask)
 
-# # evaluate model on training dataset
-# train_mAP = evaluate_model(train_set, model, cfg)
-# print("Train mAP: %.3f" % train_mAP)
-
-# # evaluate model on test dataset
-# test_mAP = evaluate_model(test_set, model, cfg)
-# print("Test mAP: %.3f" % test_mAP)
-
