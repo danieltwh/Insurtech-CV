@@ -1,3 +1,7 @@
 *.pyc
 Notebook/yolov5_1/YoloAnnotation
 Notebook/mask_rcnn_damage_0010.h5
+__pycache__/
+MASK_RCNN/mrcnn/__pycache__/
+__pycache__/
+*.h5
