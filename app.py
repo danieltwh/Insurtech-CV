@@ -103,11 +103,6 @@ def load_weights(model, path):
     model.load_weights(path, by_name=True)
 
 
-cfg, model = init_model()
-WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
-load_weights(model, WEIGHTS_PATH)
-
-
 @app.route('/')
 def home():
     return render_template(HOME_TEMPLATE)
@@ -124,8 +119,9 @@ def upload_image():
         return redirect(request.url)
     if file:
         filename = secure_filename(file.filename)
-        image_string = base64.b64encode(file.stream.read())
-        # image = Image.open(BytesIO(image_string))
+        image_string = base64.b64encode(file.read())
+        image = Image.open(BytesIO(image_string))
+        print(isinstance(Image.open(image), Image.Image))
         # model.predict(image_string)
         # output = model_predict(image_string,model,cfg)
         # print(output["class_ids"])
@@ -140,4 +136,7 @@ def about():
 
 
 if __name__ == "__main__":
+    cfg, model = init_model()
+    WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
+    load_weights(model, WEIGHTS_PATH)
     app.run(port=5000, debug=True)
