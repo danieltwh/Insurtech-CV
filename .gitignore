@@ -1,1 +1,4 @@
 Notebook/yolov5_1/YoloAnnotation
+
+# Python cache
+__pycache__
