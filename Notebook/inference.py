@@ -1,3 +1,6 @@
+from PIL import Image
+from skimage.io import imread
+from mrcnn.utils import resize_image
 from mrcnn.utils import extract_bboxes
 from mrcnn.visualize import display_instances
 from mrcnn.model import mold_image
@@ -18,9 +21,10 @@ import json
 import datetime
 import numpy as np
 import pandas as pd
-import skimage.draw
+# import skimage.draw
 import matplotlib.pyplot as plt
 import keras
+import tensorflow as tf
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../Mask_RCNN")
@@ -45,7 +49,7 @@ class PredictionConfig(Config):
     IMAGES_PER_GPU = 1
 
 
-def model_pred(image, model, cfg):
+def model_predict(image, model, cfg):
     class_names = ['BG', 'scratches', 'dents']
     # load image, bounding boxes and masks for the image id
     # image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(dataset, cfg, image_id, use_mini_mask=False)
@@ -92,17 +96,28 @@ def load_weights(model, path):
     model.load_weights(path, by_name=True)
 
 
+def resize_image_array(img_arr):
+    image, window, scale, padding, crop = resize_image(
+        img_arr,
+        min_dim=cfg.IMAGE_MIN_DIM,
+        min_scale=cfg.IMAGE_MIN_SCALE,
+        max_dim=cfg.IMAGE_MAX_DIM,
+        mode=cfg.IMAGE_RESIZE_MODE)
+    return image
+
+
+cfg, model = init_model()
+# Just for testing getting image as array from path
+imagedata = imread('./dataset_train2/train/car1.jpg')
+imgdata = imagedata.copy()
+# Here imgdata should be the image as array and will be resized to fit the model's image size requirements
+image = resize_image_array(imgdata)
+COCO_WEIGHTS_PATH = './mask_rcnn_damage_0040.h5'
+load_weights(model, COCO_WEIGHTS_PATH)
+
 # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
-def model_predict(input_image):
-    cfg, model = init_model()
-    WEIGHTS_PATH = "mask_rcnn_damage_0010.h5"
-    load_weights(model, WEIGHTS_PATH)
-    return model_pred(input_image, model, cfg)
+output = model_predict(image, model, cfg)
 
-# # evaluate model on training dataset
-# train_mAP = evaluate_model(train_set, model, cfg)
-# print("Train mAP: %.3f" % train_mAP)
-
-# # evaluate model on test dataset
-# test_mAP = evaluate_model(test_set, model, cfg)
-# print("Test mAP: %.3f" % test_mAP)
+pred_class_id = output['class_ids']
+pred_mask = output['masks']
+pred_bbox = extract_bboxes(pred_mask)
