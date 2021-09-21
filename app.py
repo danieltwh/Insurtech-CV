@@ -72,8 +72,9 @@ def model_predict(image, model, cfg):
     pred_mask = r['masks']
     pred_bbox = extract_bboxes(pred_mask)
     # display predicted image with masks and bounding boxes
-    display_instances(image, pred_bbox, pred_mask, pred_class_id,
-                      class_names, scores=r['scores'], title='Predicted')
+    
+    # display_instances(image, pred_bbox, pred_mask, pred_class_id,
+    #                   class_names, scores=r['scores'], title='Predicted')
     return r
 
 # # load the train dataset
@@ -104,6 +105,7 @@ def load_weights(model, path):
 cfg, model = init_model()
 WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
 load_weights(model, WEIGHTS_PATH)
+model.keras_model._make_predict_function()
 
 
 @app.route('/')
@@ -125,6 +127,9 @@ def upload_image():
         image_string = base64.b64encode(file.stream.read())
         base64_decoded = base64.b64decode(image_string)
         image = Image.open(BytesIO(base64_decoded))
+        # image_string = file.read()
+        # image_np = np.array(np.fromstring(image_string, np.uint8))
+
         image_np = np.array(image)
         print(image_np)
         output = model_predict(image_np ,model, cfg)
