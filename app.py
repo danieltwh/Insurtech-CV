@@ -28,7 +28,7 @@ def upload_image():
         return redirect(request.url)
     if file:
         filename = secure_filename(file.filename)
-        image_string = base64.b64encode(file.stream.read())
+        image_string = base64.b64encode(file.read())
         print(model_predict(image_string))
         return render_template(HOME_TEMPLATE, filename=filename)
     else:
