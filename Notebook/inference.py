@@ -1,3 +1,20 @@
+from PIL import Image
+from skimage.io import imread
+from mrcnn.utils import resize_image
+from mrcnn.utils import extract_bboxes
+from mrcnn.visualize import display_instances
+from mrcnn.model import mold_image
+from mrcnn.model import load_image_gt
+from mrcnn.utils import compute_ap
+from mrcnn.utils import Dataset
+from mrcnn.model import MaskRCNN
+from mrcnn.config import Config
+from numpy import mean
+from numpy import expand_dims
+from numpy import asarray
+from numpy import zeros
+from xml.etree import ElementTree
+from os import listdir
 import os
 import sys
 import json
@@ -14,37 +31,23 @@ ROOT_DIR = os.path.abspath("../Mask_RCNN")
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)
 # evaluate the mask rcnn model on the kangaroo dataset
-from os import listdir
-from xml.etree import ElementTree
-from numpy import zeros
-from numpy import asarray
-from numpy import expand_dims
-from numpy import mean
-from mrcnn.config import Config
-from mrcnn.model import MaskRCNN
-from mrcnn.utils import Dataset
-from mrcnn.utils import compute_ap
-from mrcnn.model import load_image_gt
-from mrcnn.model import mold_image
-from mrcnn.visualize import display_instances
-from mrcnn.utils import extract_bboxes
-from mrcnn.utils import resize_image
-from skimage.io import imread
-from PIL import Image
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
 # define the prediction configuration
+
+
 class PredictionConfig(Config):
-	# define the name of the configuration
-	NAME = "damage_cfg"
-	# number of classes (background + kangaroo)
-	NUM_CLASSES = 1 + 2
-	# simplify GPU config
-	GPU_COUNT = 1
-	IMAGES_PER_GPU = 1
+    # define the name of the configuration
+    NAME = "damage_cfg"
+    # number of classes (background + kangaroo)
+    NUM_CLASSES = 1 + 2
+    # simplify GPU config
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+
 
 def model_predict(image, model, cfg):
     class_names = ['BG', 'scratches', 'dents']
@@ -63,7 +66,8 @@ def model_predict(image, model, cfg):
     pred_mask = r['masks']
     pred_bbox = extract_bboxes(pred_mask)
     # display predicted image with masks and bounding boxes
-    display_instances(image, pred_bbox, pred_mask, pred_class_id, class_names , scores=r['scores'], title='Predicted')
+    display_instances(image, pred_bbox, pred_mask, pred_class_id,
+                      class_names, scores=r['scores'], title='Predicted')
     return r
 
 # # load the train dataset
@@ -78,6 +82,7 @@ def model_predict(image, model, cfg):
 # test_set.prepare()
 # print('Test: %d' % len(test_set.image_ids))
 
+
 def init_model():
     # create config
     cfg = PredictionConfig()
@@ -85,31 +90,34 @@ def init_model():
     model = MaskRCNN(mode='inference', model_dir='./', config=cfg)
     return cfg, model
 
+
 def load_weights(model, path):
     # Loading the COCO weights
     model.load_weights(path, by_name=True)
 
+
 def resize_image_array(img_arr):
     image, window, scale, padding, crop = resize_image(
-      img_arr,
-      min_dim=cfg.IMAGE_MIN_DIM,
-      min_scale=cfg.IMAGE_MIN_SCALE,
-      max_dim=cfg.IMAGE_MAX_DIM,
-      mode=cfg.IMAGE_RESIZE_MODE)
+        img_arr,
+        min_dim=cfg.IMAGE_MIN_DIM,
+        min_scale=cfg.IMAGE_MIN_SCALE,
+        max_dim=cfg.IMAGE_MAX_DIM,
+        mode=cfg.IMAGE_RESIZE_MODE)
     return image
+
 
 cfg, model = init_model()
 # Just for testing getting image as array from path
-imagedata=imread('./dataset_train2/train/car1.jpg')
+imagedata = imread('./dataset_train2/train/car1.jpg')
 imgdata = imagedata.copy()
 # Here imgdata should be the image as array and will be resized to fit the model's image size requirements
-image = resize_image_array(imgdata) 
+image = resize_image_array(imgdata)
 COCO_WEIGHTS_PATH = './mask_rcnn_damage_0040.h5'
-load_weights(model,COCO_WEIGHTS_PATH)
+load_weights(model, COCO_WEIGHTS_PATH)
 
-output = model_predict(image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+# Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+output = model_predict(image, model, cfg)
 
 pred_class_id = output['class_ids']
 pred_mask = output['masks']
 pred_bbox = extract_bboxes(pred_mask)
-

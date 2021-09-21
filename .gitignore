@@ -1,4 +1,3 @@
+*.pyc
 Notebook/yolov5_1/YoloAnnotation
-
-# Python cache
-__pycache__
+Notebook/mask_rcnn_damage_0010.h5
