@@ -1,3 +1,20 @@
+from PIL import Image
+from skimage.io import imread
+from mrcnn.utils import resize_image
+from mrcnn.utils import extract_bboxes
+from mrcnn.visualize import display_instances
+from mrcnn.model import mold_image
+from mrcnn.model import load_image_gt
+from mrcnn.utils import compute_ap
+from mrcnn.utils import Dataset
+from mrcnn.model import MaskRCNN
+from mrcnn.config import Config
+from numpy import mean
+from numpy import expand_dims
+from numpy import asarray
+from numpy import zeros
+from xml.etree import ElementTree
+from os import listdir
 import os
 import sys
 import json
@@ -69,7 +86,8 @@ def get_array_from_plot(image, boxes, masks, class_ids, class_names,
     # If no axis is passed, create one and automatically call show()
     auto_show = False
     if not ax:
-        _, ax = plt.subplots(1, figsize=figsize)
+        fig, ax = plt.subplots(1, figsize=figsize)
+        fig.subplots_adjust(0,0,1,1,0,0)
         auto_show = True
 
     # Generate random colors
@@ -77,10 +95,11 @@ def get_array_from_plot(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
+    #ax.set_ylim(height + 10, -10)
+    #ax.set_xlim(-10, width + 10)
     ax.axis('off')
     ax.set_title(title)
+    ax.margins(0,0)
 
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
@@ -106,7 +125,7 @@ def get_array_from_plot(image, boxes, masks, class_ids, class_names,
         else:
             caption = captions[i]
         ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+                color='w', size=30, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -126,21 +145,22 @@ def get_array_from_plot(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
-        fig = ax.figure
         fig.canvas.draw()
         data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
         data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
         return data
 
 # define the prediction configuration
+
+
 class PredictionConfig(Config):
-	# define the name of the configuration
-	NAME = "damage_cfg"
-	# number of classes (background + kangaroo)
-	NUM_CLASSES = 1 + 2
-	# simplify GPU config
-	GPU_COUNT = 1
-	IMAGES_PER_GPU = 1
+    # define the name of the configuration
+    NAME = "damage_cfg"
+    # number of classes (background + kangaroo)
+    NUM_CLASSES = 1 + 2
+    # simplify GPU config
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
 
 def model_predict(image, model, cfg):
     class_names = ['BG', 'scratches', 'dents']
@@ -160,7 +180,41 @@ def model_predict(image, model, cfg):
     pred_bbox = extract_bboxes(pred_mask)
     # display predicted image with masks and bounding boxes
     img_arr = get_array_from_plot(image, pred_bbox, pred_mask, pred_class_id, class_names , scores=r['scores'], title='Predicted')
-    return img_arr
+    return img_arr, pred_class_id
+
+# define the prediction configuration
+
+
+class PredictionConfig(Config):
+    # define the name of the configuration
+    NAME = "damage_cfg"
+    # number of classes (background + kangaroo)
+    NUM_CLASSES = 1 + 2
+    # simplify GPU config
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+
+
+def model_predict(image, model, cfg):
+    class_names = ['BG', 'scratches', 'dents']
+    # load image, bounding boxes and masks for the image id
+    # image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(dataset, cfg, image_id, use_mini_mask=False)
+    # convert pixel values (e.g. center)
+    scaled_image = mold_image(image, cfg)
+    # convert image into one sample
+    sample = expand_dims(scaled_image, 0)
+    # make prediction
+    yhat = model.detect(sample, verbose=0)
+    # extract results for first sample
+    r = yhat[0]
+    # Getting predicted values from r
+    pred_class_id = r['class_ids']
+    pred_mask = r['masks']
+    pred_bbox = extract_bboxes(pred_mask)
+    # display predicted image with masks and bounding boxes
+    img_arr = get_array_from_plot(image, pred_bbox, pred_mask, pred_class_id, class_names , scores=r['scores'], title='Predicted')
+    return img_arr, pred_class_id
+
 
 def init_model():
     # create config
@@ -169,29 +223,33 @@ def init_model():
     model = MaskRCNN(mode='inference', model_dir='./', config=cfg)
     return cfg, model
 
+
 def load_weights(model, path):
     # Loading the COCO weights
     model.load_weights(path, by_name=True)
 
+
 def resize_image_array(img_arr):
     image, window, scale, padding, crop = resize_image(
-      img_arr,
-      min_dim=cfg.IMAGE_MIN_DIM,
-      min_scale=cfg.IMAGE_MIN_SCALE,
-      max_dim=cfg.IMAGE_MAX_DIM,
-      mode=cfg.IMAGE_RESIZE_MODE)
+        img_arr,
+        min_dim=cfg.IMAGE_MIN_DIM,
+        min_scale=cfg.IMAGE_MIN_SCALE,
+        max_dim=cfg.IMAGE_MAX_DIM,
+        mode=cfg.IMAGE_RESIZE_MODE)
     return image
+
 
 cfg, model = init_model()
 # Just for testing getting image as array from path
-imagedata=imread('./dataset_train2/train/car1.jpg')
+imagedata = imread('./dataset_train2/train/car1.jpg')
 imgdata = imagedata.copy()
 # Here imgdata should be the image as array and will be resized to fit the model's image size requirements
-image = resize_image_array(imgdata) 
+image = resize_image_array(imgdata)
 COCO_WEIGHTS_PATH = './mask_rcnn_damage_0040.h5'
-load_weights(model,COCO_WEIGHTS_PATH)
+load_weights(model, COCO_WEIGHTS_PATH)
 
-output = model_predict(image,model,cfg) # Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+# Outputs a dictionary which contains the predicted mask, class ids, bounding boxes, and scores
+output = model_predict(image, model, cfg)
 
 #img_pil = Image.fromarray(output)
 #img_pil.show()
