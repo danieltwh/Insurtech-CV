@@ -1,44 +1,43 @@
 # Root directory of the project
-from mrcnn.utils import extract_bboxes
-from mrcnn.visualize import display_instances
-from mrcnn.model import mold_image
-from mrcnn.model import load_image_gt
-from mrcnn.utils import compute_ap
-from mrcnn.utils import Dataset
-from mrcnn.model import MaskRCNN
-from mrcnn.config import Config
-from numpy import mean
-from numpy import expand_dims
-from numpy import asarray
-from numpy import zeros
-from xml.etree import ElementTree
-from os import listdir
-import os
-import sys
-import base64
-from io import BytesIO
-from PIL import Image
-from flask import Flask, flash, request, redirect, url_for, render_template
-from werkzeug.utils import secure_filename
 
-import json
-import datetime
-import numpy as np
-import pandas as pd
-# import skimage.draw
-import matplotlib.pyplot as plt
 import keras
-
-# # Import Mask RCNN
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import datetime
+import json
+from werkzeug.utils import secure_filename
+from flask import Flask, flash, request, redirect, url_for, render_template
+from PIL import Image
+from io import BytesIO
+import base64
+import sys
+import os
+from os import listdir
+from xml.etree import ElementTree
+from numpy import zeros
+from numpy import asarray
+from numpy import expand_dims
+from numpy import mean
+# Import Mask RCNN
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
-sys.path.append(ROOT_DIR)  # To find local version of the library
+sys.path.append(ROOT_DIR)  
+# To find local version of the library
+from mrcnn.config import Config
+from mrcnn.model import MaskRCNN
+from mrcnn.utils import Dataset
+from mrcnn.utils import compute_ap
+from mrcnn.model import load_image_gt
+from mrcnn.model import mold_image
+from mrcnn.visualize import display_instances
+from mrcnn.utils import extract_bboxes
+
+# import skimage.draw
 
 
 # from Notebook.inference import PredictionConfig, model_predict, init_model, load_weights
 
-# # Import Mask RCNN
-ROOT_DIR = os.path.abspath("./Mask_RCNN")
-sys.path.append(ROOT_DIR)  # To find local version of the library
+
 
 HOME_TEMPLATE = 'index.html'
 ABOUT_TEMPLATE = 'about.html'
@@ -102,6 +101,10 @@ def load_weights(model, path):
     # Loading the COCO weights
     model.load_weights(path, by_name=True)
 
+cfg, model = init_model()
+WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
+load_weights(model, WEIGHTS_PATH)
+
 
 @app.route('/')
 def home():
@@ -119,11 +122,12 @@ def upload_image():
         return redirect(request.url)
     if file:
         filename = secure_filename(file.filename)
-        image_string = base64.b64encode(file.read())
-        image = Image.open(BytesIO(image_string))
-        print(isinstance(Image.open(image), Image.Image))
-        # model.predict(image_string)
-        # output = model_predict(image_string,model,cfg)
+        image_string = base64.b64encode(file.stream.read())
+        base64_decoded = base64.b64decode(image_string)
+        image = Image.open(BytesIO(base64_decoded))
+        image_np = np.array(image)
+        print(image_np)
+        output = model_predict(image_np ,model, cfg)
         # print(output["class_ids"])
         return render_template(HOME_TEMPLATE, filename=filename, pred=output['class_ids'])
     else:
@@ -136,7 +140,4 @@ def about():
 
 
 if __name__ == "__main__":
-    cfg, model = init_model()
-    WEIGHTS_PATH = "Notebook/mask_rcnn_damage_0010.h5"
-    load_weights(model, WEIGHTS_PATH)
     app.run(port=5000, debug=True)
