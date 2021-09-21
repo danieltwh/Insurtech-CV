@@ -5,3 +5,7 @@ __pycache__/
 MASK_RCNN/mrcnn/__pycache__/
 __pycache__/
 *.h5
+
+scripts/best.h5
+
+Mask_RCNN/
