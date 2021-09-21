@@ -1,17 +1,18 @@
 import os 
 import sys
-from typing import List, Literal, Tuple, TypedDict
-
-import numpy as np
-
-from PredictionType import DetectionPrediction
 
 sys.path.append(os.path.abspath('../Mask_RCNN'))
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
 
+import numpy as np
+
+from typing import List, Literal, Tuple
+from typedefs import DetectionPrediction, Model, Image, npArray
+
 '''
 TODO: UNTESTED CODE
+TODO: Implement predict functions returning drawn images
 '''
 class MRCNNPrediction(DetectionPrediction):
     mask: np.ndarray
@@ -19,7 +20,7 @@ class MRCNNPrediction(DetectionPrediction):
 class DamagePrediction(MRCNNPrediction):
     name: Literal["BG", "scratches", "dents"]
 
-class MRCNNModel:
+class MRCNNModel(Model[DamagePrediction]):
     class PredictionConfig(Config):
         NAME = "damage_cfg"
         NUM_CLASSES = 1 + 2 # Background + Everything else
@@ -43,7 +44,7 @@ class MRCNNModel:
         self.model = MaskRCNN(mode="inference", model_dir="./", config=self.cfg)
         self.model.load_weights(path, by_name=True)
 
-    def predict_batch(self, imgs:List[np.ndarray]) ->  Tuple[np.ndarray, List[DamagePrediction]]:
+    def predict_batch(self, imgs:List[Image]) ->  Tuple[Image, List[DamagePrediction]]:
         # TODO: change imgs from List[np.ndarray] to standard np.ndarray
         scaled_imgs = mold_image(imgs, self.cfg)
         results = self.model.detect(scaled_imgs, 0)
@@ -52,16 +53,25 @@ class MRCNNModel:
 
         return original_imgs, results
 
-    def predict_single(self, img:np.ndarray) -> Tuple[np.ndarray, List[DamagePrediction]]:
+    def predict_single(self, img:Image) -> Tuple[Image, List[DamagePrediction]]:
         original_imgs, coords = self.predict_batch([img])
         return original_imgs[0], coords
 
 if __name__ == "__main__":
-    model = MRCNNModel()
-
-    import cv2
-    img = cv2.imread("1.jpg")
+    # Loading image for demonstration
+    from PIL import Image
+    img = np.asarray(Image.open('1.jpg'))
     
-    original, coords = model.predict_single(img)
+    # The (only) two lines needed
+    model = MRCNNModel()
+    original, processed, coords = model.predict_single(img)
+
+    # Printing coords to show correctness
     print(coords)
-    cv2.imwrite("original.jpg", original)
+
+    # Saving images to show correctness
+    original = Image.fromarray(original)
+    processed = Image.fromarray(processed)
+
+    original.save("mrcnn_original.jpg")
+    processed.save("mrcnn_processed.jpg")
