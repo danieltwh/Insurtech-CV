@@ -1,6 +1,5 @@
 from abc import abstractmethod, ABCMeta
-from typing import TypedDict, TypeVar, Sequence, Generic, List, Tuple
-import numpy as np
+from typing import TypeVar, Sequence, Generic, List, Tuple
 import numpy.typing as npt
 
 Image = npt.ArrayLike
@@ -8,7 +7,7 @@ Image = npt.ArrayLike
 T = TypeVar('T')
 npArray = Sequence[T] 
 
-class BoundingBox(TypedDict):
+class BoundingBox:
     """ A Class representing a bounding box
 
     A BoundingBox must obey the following format: 
@@ -28,7 +27,7 @@ class BoundingBox(TypedDict):
     xmax: float
     ymax: float
 
-class DetectionPrediction(TypedDict):
+class DetectionPrediction:
     """ Parent class of all model predictions.
 
     Any ModelPrediction must inherit from DetectionPrediction. This class defines
