@@ -33,11 +33,15 @@
                     autocomplete="off" required>
             </p>
             <p><input class="myButton" type="submit" value="Submit"></input></p>
-            <p><img id="output" height="300px" /></p>
+            <p>
+                {% if not filename %}
+                <img id="output" height="300px" />
+                {% endif %}
+            </p>
         </form>
         {% if filename %}
         <div>
-            <img src={{pred}}>
+            <img src={{pred}} height="400px">
         </div>
         {% endif %}
     </div>
