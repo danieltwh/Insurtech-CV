@@ -1,8 +1,9 @@
 import torch
 import numpy as np
 
-from typing import List, Literal, Tuple
-from typedefs import DetectionPrediction, Model, Image, npArray
+from typing import List, Tuple
+from typing_extensions import Literal
+from .typedefs import DetectionPrediction, Model, Image, npArray
 
 class YoloPrediction(DetectionPrediction):
     """ A Class representing a Yolov5 prediction
@@ -41,7 +42,7 @@ class YoloModel(Model[CarSidePrediction]):
                 raise ValueError("Unable to load model. Received path is: {}".format(path))
             raise e
         
-        self.model.conf = kwargs["conf"] if "conf" in kwargs else 0.25
+        self.model.conf = kwargs["conf"] if "conf" in kwargs else 0.1
         self.model.iou = kwargs["iou"]  if "iou" in kwargs else 0.45
 
 

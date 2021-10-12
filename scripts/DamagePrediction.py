@@ -7,7 +7,8 @@ from mrcnn.model import MaskRCNN
 
 import numpy as np
 
-from typing import List, Literal, Tuple
+from typing import List, NoReturn, Tuple, Type, Union
+from typing_extensions import Literal
 from typedefs import DetectionPrediction, Model, Image, npArray
 
 '''
@@ -18,7 +19,7 @@ class MRCNNPrediction(DetectionPrediction):
     mask: np.ndarray
 
 class DamagePrediction(MRCNNPrediction):
-    name: Literal["BG", "scratches", "dents"]
+    name: Union[Literal["BG"], Literal["scratches"], Literal["dents"]]
 
 class MRCNNModel(Model[DamagePrediction]):
     class PredictionConfig(Config):
@@ -31,12 +32,12 @@ class MRCNNModel(Model[DamagePrediction]):
         DETECTION_MIN_CONFIDENCE: float    
         DETECTION_NMS_THRESHOLD: float
 
-        def __init__(self, conf: float, iou: float) -> None:
+        def __init__(self, conf: float, iou: float) -> NoReturn:
             super().__init__()
             self.DETECTION_MIN_CONFIDENCE = conf
             self.DETECTION_NMS_THRESHOLD = iou
 
-    def __init__(self, path: str = "best.h5", **kwargs) -> None:
+    def __init__(self, path: str = "best.h5", **kwargs) -> NoReturn:
         conf : float = kwargs["conf"] if "conf" in kwargs else 0.7  # confidence threshold [0., 1.]
         iou : float = kwargs["iou"]  if "iou" in kwargs else 0.3    # NMS IoU threshold [0., 1.]
 
