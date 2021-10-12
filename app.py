@@ -202,7 +202,7 @@ def resize_image_array(img_arr):
 
 graph = tf.get_default_graph()
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0040.h5'
+COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0010.h5'
 load_weights(model, COCO_WEIGHTS_PATH)
 
 @app.route('/')
