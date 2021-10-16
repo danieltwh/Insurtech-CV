@@ -3,7 +3,7 @@ import numpy as np
 
 from typing import List, Tuple
 from typing_extensions import Literal
-from .typedefs import DetectionPrediction, Model, Image, npArray
+from typedefs import DetectionPrediction, Model, Image, npArray
 
 class YoloPrediction(DetectionPrediction):
     """ A Class representing a Yolov5 prediction
