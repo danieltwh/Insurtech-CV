@@ -33,10 +33,25 @@ class CarSidePrediction(YoloPrediction):
     """
     name: Literal["Front", "Back", "Side"]
 
+class DamagePrediction(YoloPrediction):
+    """ A Class representing a car side prediction
+
+    Attributes
+    ----------
+    boundingBox: BoundingBox
+        BoundingBox
+    confidence: float
+        Prediction confidence, ranges from 0. to 1.
+    name: Literal["Scratches", "Dent"]
+        Prediction name
+    """
+    name: Literal["Scratches", "Dent"]
+
 class YoloModel(Model[CarSidePrediction]):
     def __init__(self, path: str = "./best.pt", **kwargs) -> None:
         try:
             self.model = torch.hub.load('ultralytics/yolov5', 'custom', path = path, force_reload=True)
+            
         except Exception as e: 
             if ("force_reload=True" in str(e)) :
                 raise ValueError("Unable to load model. Received path is: {}".format(path))
@@ -48,6 +63,31 @@ class YoloModel(Model[CarSidePrediction]):
 
     def predict_batch(self, imgs:List[Image]) -> Tuple[npArray[Image], npArray[Image], List[CarSidePrediction]]:
         results = self.model(imgs)
+        
+        original_imgs : npArray[Image]  = np.copy(results.imgs)
+        processed_imgs: npArray[Image]  = results.render()
+        coords: List[CarSidePrediction] = results.pandas().xyxy[0].to_json(orient="records") # Contains coordinates of the detection
+        return original_imgs, processed_imgs, coords
+
+    def predict_single(self, img:Image) -> Tuple[Image, Image, List[CarSidePrediction]]:
+        original_imgs, processed_imgs, coords = self.predict_batch([img])
+        return original_imgs[0], processed_imgs[0], coords
+
+class YoloModel_dmg(Model[DamagePrediction]):
+    def __init__(self, path: str = "./best_damage.pt", **kwargs) -> None:
+        try:
+            self.model1 = torch.hub.load('ultralytics/yolov5', 'custom', path = path)
+        except Exception as e: 
+            if ("force_reload=True" in str(e)) :
+                raise ValueError("Unable to load model. Received path is: {}".format(path))
+            raise e
+        
+        self.model1.conf = kwargs["conf"] if "conf" in kwargs else 0.1
+        self.model1.iou = kwargs["iou"]  if "iou" in kwargs else 0.45
+
+
+    def predict_batch(self, imgs:List[Image]) -> Tuple[npArray[Image], npArray[Image], List[CarSidePrediction]]:
+        results = self.model1(imgs)
         
         original_imgs : npArray[Image]  = np.copy(results.imgs)
         processed_imgs: npArray[Image]  = results.render()

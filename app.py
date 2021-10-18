@@ -20,7 +20,9 @@ from numpy import asarray
 from numpy import expand_dims
 from numpy import mean
 
-from scripts.CarSidePrediction import YoloModel
+
+from scripts.CarSidePrediction import YoloModel,YoloModel_dmg
+
 # Import Mask RCNN
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
 sys.path.append(ROOT_DIR)  
@@ -202,7 +204,7 @@ def resize_image_array(img_arr):
 
 graph = tf.get_default_graph()
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0040.h5'
+COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0010.h5'
 load_weights(model, COCO_WEIGHTS_PATH)
 
 @app.route('/')
@@ -229,18 +231,29 @@ def upload_image():
         image_np = np.array(image)
         image = resize_image_array(image_np)
 
-        # Yolo model predict
+        # Yolo model predict (CarSide)
         yolo_model = YoloModel("./scripts/best.pt")
-        original, processed, coords = yolo_model.predict_single(image)
+        original_side, processed_side, coords_side = yolo_model.predict_single(image)
+        
+        # Yolo model predict (Damage)
+        yolo_model = YoloModel_dmg("./scripts/best_damage.pt")
+        original_dmg, processed_dmg, coords_dmg = yolo_model.predict_single(image)
+
         # Printing coords to show correctness
-        print(coords)
-        yolo_pil_img = Image.fromarray(processed)
+        print(coords_side)
+        print(coords_dmg)
+        yolo_pil_img = Image.fromarray(processed_side)
         yolo_rawBytes = io.BytesIO()
         yolo_pil_img.save(yolo_rawBytes, "JPEG")
         yolo_rawBytes.seek(0)
+
         yolo_img_base64 = base64.b64encode(yolo_rawBytes.getvalue()).decode('ascii')
         mime = "image/jpeg"
         yolo_uri = "data:%s;base64,%s"%(mime, yolo_img_base64)
+
+        
+        
+
 
         #Mask_RCNN predict
         with graph.as_default():
