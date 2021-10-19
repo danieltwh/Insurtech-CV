@@ -234,9 +234,6 @@ def upload_image():
         with graph.as_default():
             output,pred_class_id, pred_mask = model_predict(image ,model, cfg)
 
-        # Getting the estimated cost
-        total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
-
         scale = 0.5
         h,w = output.shape[:2]
         image_dtype = output.dtype # Save image type before resizing
@@ -261,7 +258,8 @@ def upload_image():
         yolo_img_base64 = base64.b64encode(yolo_rawBytes.getvalue()).decode('ascii')
         yolo_mime = "yolo_image/jpeg"
         yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
-
+        # Getting the estimated cost
+        total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
 
         return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = total_cost, yolo_pred=yolo_uri)
     else:
