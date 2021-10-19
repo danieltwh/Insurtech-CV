@@ -21,6 +21,7 @@ from numpy import expand_dims
 from numpy import mean
 
 from scripts.CarSidePrediction import YoloModel
+from scripts.CostPrediction import Cost_Estimate
 # Import Mask RCNN
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
 sys.path.append(ROOT_DIR)  
@@ -175,7 +176,7 @@ def model_predict(image, model, cfg):
     pred_bbox = extract_bboxes(pred_mask)
     # display predicted image with masks and bounding boxes
     img_arr = get_array_from_plot(image, pred_bbox, pred_mask, pred_class_id, class_names , scores=r['scores'], title='Predicted')
-    return img_arr, pred_class_id
+    return img_arr, pred_class_id, pred_mask
 
 
 def init_model():
@@ -202,7 +203,7 @@ def resize_image_array(img_arr):
 
 graph = tf.get_default_graph()
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0040.h5'
+COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0010.h5'
 load_weights(model, COCO_WEIGHTS_PATH)
 
 @app.route('/')
@@ -231,7 +232,11 @@ def upload_image():
         
         #Mask_RCNN predict
         with graph.as_default():
-            output,pred_class_id = model_predict(image ,model, cfg)
+            output,pred_class_id, pred_mask = model_predict(image ,model, cfg)
+
+        # Getting the estimated cost
+        total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
+
         scale = 0.5
         h,w = output.shape[:2]
         image_dtype = output.dtype # Save image type before resizing
@@ -258,7 +263,7 @@ def upload_image():
         yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
 
 
-        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, yolo_pred=yolo_uri)
+        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = total_cost, yolo_pred=yolo_uri)
     else:
         return redirect(request.url)
 

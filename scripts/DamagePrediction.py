@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath('../Mask_RCNN'))
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
+from mrcnn.model import mold_image
 
 import numpy as np
 
