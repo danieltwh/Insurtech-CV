@@ -67,7 +67,72 @@ def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
     total_cost = f"${total_cost[0]} - ${total_cost[1]}"
     return total_cost
 
+# yet to edit
+def Cost_Estimate_YOLO(loc_coords, damage_mask, pred_class_id, image):
+    location_mask = {}
+    location_confidence = {}
+    height, width, col = image.shape
+    for loc in list(eval(loc_coords)):
+        curr_name = loc["name"]
+        curr_confidence = loc["confidence"]
 
+        # print(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])
+        # print(h, w)
+
+        if curr_name not in location_confidence or location_confidence.get(curr_name) < curr_confidence:
+            mask = np.zeros((height, width))
+
+            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])))
+
+            mask = cv.rectangle(mask, (xmin, ymin), (xmax, ymax), color=(1, 1, 1), thickness=-1)
+
+            location_mask[curr_name] = mask
+            location_confidence[curr_name] = curr_confidence
+
+    location_with_damages = {} 
+
+    for key, val in location_mask.items():
+        location_with_damages[key] = []
+
+    tracker = 0
+    damage = ["BG", "Scratches", "Dents"]
+    for damage_pred in pred_class_id:
+        damage_name = damage[damage_pred]
+        mask = np.copy(damage_mask[:, :, tracker])
+        tracker += 1
+
+        curr_area = np.count_nonzero(mask)
+        # print(damage_name, curr_area)
+
+        damage_loc = ""
+        max_intersect_area = 0
+
+        for location, mask2 in location_mask.items():
+            combined = mask + mask2
+            intersect = np.sum(np.where(combined==2, 1, 0))
+            intersect_area = intersect / curr_area
+            # print(location, intersect_area)
+            if intersect_area > max_intersect_area or (max_intersect_area == 0 and intersect_area == 0):
+                damage_loc = location
+                max_intersect_area = intersect_area
+
+        location_with_damages[damage_loc].append(damage_name)
+
+    # print(location_with_damages)
+
+    damage_to_cost = {
+        "Scratches" : (200, 400),
+        "Dents": (400, 1000)
+    }
+
+    total_cost = (0, 0)
+
+    for key, val in location_with_damages.items():
+        temp = max(list(map(lambda x: damage_to_cost[x], val)))
+        total_cost = tuple(map(sum, zip(total_cost, temp)))
+
+    total_cost = f"${total_cost[0]} - ${total_cost[1]}"
+    return total_cost
 
 if __name__ == "__main__":
     from CarSidePrediction import YoloModel
