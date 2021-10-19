@@ -229,26 +229,10 @@ def upload_image():
         # image_np = np.array(np.fromstring(image_string, np.uint8))
         image_np = np.array(image)
         image = resize_image_array(image_np)
-
-        # Yolo model predict
-        yolo_model = YoloModel("./scripts/best.pt")
-        original, processed, coords = yolo_model.predict_single(image)
-        # Printing coords to show correctness
-        print(coords)
-        yolo_pil_img = Image.fromarray(processed)
-        yolo_rawBytes = io.BytesIO()
-        yolo_pil_img.save(yolo_rawBytes, "JPEG")
-        yolo_rawBytes.seek(0)
-        yolo_img_base64 = base64.b64encode(yolo_rawBytes.getvalue()).decode('ascii')
-        mime = "image/jpeg"
-        yolo_uri = "data:%s;base64,%s"%(mime, yolo_img_base64)
-
+        
         #Mask_RCNN predict
         with graph.as_default():
             output,pred_class_id, pred_mask = model_predict(image ,model, cfg)
-
-        # Getting the estimated cost
-        total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
 
         scale = 0.5
         h,w = output.shape[:2]
@@ -262,8 +246,22 @@ def upload_image():
         img_base64 = base64.b64encode(rawBytes.getvalue()).decode('ascii')
         mime = "image/jpeg"
         uri = "data:%s;base64,%s"%(mime, img_base64)
+        # Yolo model predict
+        yolo_model = YoloModel("./scripts/best.pt")
+        original, processed, coords = yolo_model.predict_single(image)
+        # Printing coords to show correctness
+        print(coords)
+        yolo_pil_img = Image.fromarray(processed)
+        yolo_rawBytes = io.BytesIO()
+        yolo_pil_img.save(yolo_rawBytes, "JPEG")
+        yolo_rawBytes.seek(0)
+        yolo_img_base64 = base64.b64encode(yolo_rawBytes.getvalue()).decode('ascii')
+        yolo_mime = "yolo_image/jpeg"
+        yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
+        # Getting the estimated cost
+        total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
 
-        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = total_cost)
+        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = total_cost, yolo_pred=yolo_uri)
     else:
         return redirect(request.url)
 
