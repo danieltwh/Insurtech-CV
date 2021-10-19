@@ -1,7 +1,7 @@
 import cv2 as cv
+import numpy as np
 
-
-def cost_estimate(loc_coords, damage_mask, pred_class_id, image):
+def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
     location_mask = {}
     location_confidence = {}
     height, width, col = image.shape
