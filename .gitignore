@@ -9,3 +9,4 @@ __pycache__/
 scripts/best.h5
 
 Mask_RCNN/
+*.h5

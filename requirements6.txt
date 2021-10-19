@@ -133,3 +133,5 @@ widgetsnbextension==3.5.1
 wincertstore==0.2
 wrapt==1.12.1
 zipp==3.5.0
+
+typedef=0.9.0.7
