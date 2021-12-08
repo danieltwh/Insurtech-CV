@@ -4,16 +4,29 @@
 
 - [Fintech Society ML - Insurtech Computer Vision](#fintech-society-ml---insurtech-computer-vision)
   - [Table of Contents](#table-of-contents)
+  - [Notes](#notes)
   - [Installation](#installation)
   - [Usage](#usage)
     - [Training and Testing](#training-and-testing)
     - [Deployment](#deployment)
   - [Annotation](#annotation)
   - [Label guide](#label-guide)
-  - [YoloV5](#yolov5)
-    - [Requirements](#requirements)
-    - [Instructions](#instructions)
-  - [Directory Structure](#directory-structure)
+  - [Miscellaneous](#miscellaneous)
+    - [Yolov5 Training / Inference](#yolov5-training--inference)
+
+## Notes
+
+1. This repository makes use of Matterport's implementation of Mask-RCNN:
+    - Tensorflow 1.15
+    - Supports Python <=3.7 (Tested on Python3.7)
+
+    Please use `virtualenv` to create an environment with python3.7. Other python versions may lead to installation issues
+
+2. By default, the provided `requirements.txt` provides installation for CPU version of the libraries i.e. Tensorflow and PyTorch. Please install the GPU versions if necessary
+
+```bash
+python3 -m pip install tensorflow-gpu=1.15 cudatoolkit
+```
 
 ## Installation
 
@@ -35,24 +48,18 @@
 2. Install the requirements by running
 
     ```bash
-    pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt
     ```
-
-3. Create a new virtual environment using the given yaml file
-
-    ```bash
-    conda env update -n mlcv --file mlcv_env.yaml
-    ```
-
-    This yaml includes the basic dependencies required by Mask-RCNN, PyTorch, as well as other dependencies needed.
 
 ## Usage
 
-Before proceeding, activate the virtual environment: `conda activate mlcv`
-
 ### Training and Testing
 
+Jupyter notebooks are provided in the `development` folder.
+
 ### Deployment
+
+The website is deployed using `flask`. Code for this is in `app.py`, and the scripts for ML related services are in `scripts/` folder.
 
 ## Annotation
 
@@ -68,27 +75,11 @@ Before proceeding, activate the virtual environment: `conda activate mlcv`
 
 Scratches and dents
 
-## YoloV5
+## Miscellaneous
 
-### Requirements
+### Yolov5 Training / Inference
 
-```txt
-json
-yaml
-bidict
-```
-
-### Instructions
-
-- Get the `Yolov5` repo as a submodule
-
-    ```bash
-    git clone <REPO NAME>
-    git submodule init
-    git submodule update
-    ```
-
-- Generate Yolo-formatted annotations using the `Notebook/Yolov5.ipynb` [Note the configs]
+- Generate Yolo-formatted annotations using the `development/Notebook/Yolov5.ipynb` [Note the configs]
 - Edit the `data.yaml` (saved to output_dir) with the corresponding directories. The `data.yaml` file should look like this
 
     ```yaml
@@ -105,7 +96,7 @@ bidict
 - Move the `data.yaml` file to `yolov5/data` directory
 - Assuming training and validation data are present in `yolov5/data/YoloDataset` directory, structure workspace as follows:
 
-    ```
+    ```bash
     yolov5
         |___data
             |___YoloDataset
@@ -140,5 +131,3 @@ bidict
         # TODO: Format results appropriately
         return results
     ```
-
-## Directory Structure
