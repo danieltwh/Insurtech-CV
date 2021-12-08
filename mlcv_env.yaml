@@ -1,0 +1,36 @@
+name: mlcv
+channels:
+    - conda-forge
+    - pytorch
+dependencies:
+# Basic Requirements
+    - python>=3.6
+
+# Mask-RCNN Requirements
+    - cython<=0.29.24
+    - scikit-image
+    - tensorflow-gpu<=1.15.0
+    - keras<=2.1.6
+    - h5py<=2.10.0
+    - imgaug<=0.4.0
+    - IPython[all]
+
+# Yolov5 Requirements
+    - matplotlib>=3.2.2
+    - numpy>=1.18.5
+    - Pillow>=7.1.2
+    - PyYAML>=5.3.1
+    - requests>=2.23.0
+    - scipy>=1.4.1
+    - pytorch>=1.7.0
+    - torchvision>=0.8.1
+    - tqdm>=4.41.0
+    - tensorboard>=2.4.1
+    - pandas>=1.1.4
+    - seaborn>=0.11.0
+    - albumentations>=1.0.3
+    - pycocotools>=2.0  # COCO mAP
+    - pip
+    - pip: 
+      - thop  # FLOPs computation
+      - opencv-python>=4.1.2
