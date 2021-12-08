@@ -203,7 +203,7 @@ def resize_image_array(img_arr):
 
 graph = tf.get_default_graph()
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = './Notebook/mask_rcnn_damage_0010.h5'
+COCO_WEIGHTS_PATH = './development/Notebook/mask_rcnn_damage_0010.h5' # TODO: Move weights to another folder
 load_weights(model, COCO_WEIGHTS_PATH)
 
 @app.route('/')
@@ -248,11 +248,11 @@ def upload_image():
         uri = "data:%s;base64,%s"%(mime, img_base64)
 
         # Yolo model predict
-        yolo_model = YoloModel("./scripts/best.pt")
+        yolo_model = YoloModel("./scripts/best.pt") # TODO: Move weights to another folder
         original, processed_side, coords = yolo_model.predict_single(image)
 
         # Yolo model predict (Damage)
-        yolo_model = YoloModel_dmg("./scripts/best_damage.pt")
+        yolo_model = YoloModel_dmg("./scripts/best_damage.pt") # TODO: Move weights to another folder
         original_dmg, processed_dmg, coords_dmg = yolo_model.predict_single(image)
 
         # Printing coords to show correctness

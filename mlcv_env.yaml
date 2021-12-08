@@ -34,3 +34,5 @@ dependencies:
     - pip: 
       - thop  # FLOPs computation
       - opencv-python>=4.1.2
+
+# Website Requirements
