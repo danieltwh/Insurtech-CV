@@ -201,9 +201,10 @@ def resize_image_array(img_arr):
         mode=cfg.IMAGE_RESIZE_MODE)
     return image
 
+# Loading Tensorflow Model
 graph = tf.get_default_graph()
 cfg, model = init_model()
-COCO_WEIGHTS_PATH = './development/Notebook/mask_rcnn_damage_0010.h5' # TODO: Move weights to another folder
+COCO_WEIGHTS_PATH = './weights/Damage_MRCNN.h5'
 load_weights(model, COCO_WEIGHTS_PATH)
 
 @app.route('/')
@@ -248,12 +249,12 @@ def upload_image():
         uri = "data:%s;base64,%s"%(mime, img_base64)
 
         # Yolo model predict
-        yolo_model = YoloModel("./scripts/best.pt") # TODO: Move weights to another folder
-        original, processed_side, coords = yolo_model.predict_single(image)
+        carside_model = YoloModel("./weights/Carside_Yolo.pt")
+        _, _, coords = carside_model.predict_single(image)
 
         # Yolo model predict (Damage)
-        yolo_model = YoloModel_dmg("./scripts/best_damage.pt") # TODO: Move weights to another folder
-        original_dmg, processed_dmg, coords_dmg = yolo_model.predict_single(image)
+        damage_model = YoloModel_dmg("./weights/Damage_Yolo.pt")
+        _, processed_dmg, coords_dmg = damage_model.predict_single(image)
 
         # Printing coords to show correctness
         print(coords)

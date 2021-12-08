@@ -24,9 +24,15 @@
 
 2. By default, the provided `requirements.txt` provides installation for CPU version of the libraries i.e. Tensorflow and PyTorch. Please install the GPU versions if necessary
 
-```bash
-python3 -m pip install tensorflow-gpu=1.15 cudatoolkit
-```
+    ```bash
+    python3 -m pip install tensorflow-gpu=1.15 cudatoolkit
+    ```
+
+3. Model weights:
+   Please download the following model weights and place them in the `weights` folder
+   1. Damage Prediction (Mask-RCNN): [Google Drive](https://drive.google.com/file/d/17-8pvALFJ-PD_TEnvvqrfQG3NfxsvJuW/view?usp=sharing)
+   2. Damage Prediction (YoloV5): [Google Drive](https://drive.google.com/file/d/1noe1qYE00KmJnR85Ol3-mpMlQ8Nj3CDH/view?usp=sharing)
+   3. CarSide Prediction (YoloV5): [Google Drive](https://drive.google.com/file/d/1IspwPDGZIMo7i85tzygx2Q13ovcuJ_oj/view?usp=sharing)
 
 ## Installation
 
@@ -59,7 +65,13 @@ Jupyter notebooks are provided in the `development` folder.
 
 ### Deployment
 
-The website is deployed using `flask`. Code for this is in `app.py`, and the scripts for ML related services are in `scripts/` folder.
+The website is deployed using `flask`. Code for this is in `app.py`, and the scripts for ML related services are in `scripts/` folder. The website can be deployed by running: 
+
+```bash
+python3 app.py
+```
+
+To see the website, go to `localhost:5000`.
 
 ## Annotation
 
