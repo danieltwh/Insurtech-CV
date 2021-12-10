@@ -6,6 +6,7 @@ __init__.py
 
 # Other files
 development/Notebook/yolov5_1/YoloAnnotation
+Mask_RCNN/**
 
 # Model weights
 *.h5
