@@ -29,26 +29,27 @@
     <div class="myContainer">
         <h2>Estimate the cost of repairing your car</h2>
         <form method="post" action="/" enctype="multipart/form-data">
-            <p><input class="myButton" type="file" accept="image/*" name="file" id="file" onchange="loadFile(event)"
+            <p><input class="myButton" type="file" accept="image/jpg, image/jpeg" name="file" id="file" onchange="loadFile(event)"
                     autocomplete="off" required>
             </p>
             <p><input class="myButton" type="submit" value="Submit"></input></p>
-            <p>
-                {% if not filename %}
-                <img id="output" height="300px" />
-                {% endif %}
-            </p>
         </form>
         {% if filename %}
-        <div>
-            <img src={{pred}} height="400px">
+        <div class="horizontalContainer">
+            <div class="horiFlex">
+                <p>Mask_RCNN Prediction:</p>
+                <img src={{pred}} height="400px">
+            </div>
+            <div class="horiFlex">
+                <p>Yolo Prediction:</p>
             <img src={{yolo_pred}} height="400px">
+            </div>
         </div>
         {% endif %}
 
         {% if filename %}
         <div>
-            <p>{{total_cost}}</p>
+            <p>Estimated cost: ${{total_cost}}</p>
         </div>
         {% endif %}
 
