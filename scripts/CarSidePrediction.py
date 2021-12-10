@@ -1,4 +1,5 @@
 import torch
+torch.cuda.is_available = lambda : False # Forces to use CPU as without it this may cause segfault
 import numpy as np
 
 from typing import List, Tuple
@@ -49,7 +50,7 @@ class DamagePrediction(YoloPrediction):
 class YoloModel(Model[CarSidePrediction]):
     def __init__(self, path: str = "./best.pt", **kwargs) -> None:
         try:
-            self.model = torch.hub.load('ultralytics/yolov5', 'custom', path = path, force_reload=True)
+            self.model = torch.hub.load('ultralytics/yolov5', 'custom', path = path)
         except Exception as e: 
             if ("force_reload=True" in str(e)) :
                 raise ValueError("Unable to load model. Received path is: {}".format(path))
