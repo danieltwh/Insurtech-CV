@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Insurtech</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/style.css') }}" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/SocietyLogo.png') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script>
+        var loadFile = function (event) {
+            var image = document.getElementById('output');
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="myContainer">
+            <img class="logo" src="{{ url_for('static', filename='images/SocietyLogo.png') }}" />
+            <nav>
+                <ul>
+                    <li><a href="/">Predict</a></li>
+                    <li><a href="/about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="myContainer">
+        <h4>Donec facilisi magna curabitur suscipit lectus maecenas sapien. Faucibus mus mus cras ultrices. Maecenas
+            tincidunt vestibulum sodales elementum mus venenatis praesent quam tellus est. Laoreet imperdiet, sagittis
+            lorem platea per. Euismod, dis dictum erat etiam congue scelerisque. Fames hendrerit commodo luctus ut
+            libero, taciti eget. Magnis ac dignissim dignissim nascetur accumsan mi dis felis velit. Nulla odio
+            volutpat.
+
+            Amet lobortis taciti non duis arcu! Sem dictumst enim primis ligula amet ut neque erat dignissim iaculis
+            ornare. Blandit lacus interdum porta. Per fringilla sed neque conubia. Parturient penatibus eget non rhoncus
+            aliquam pulvinar elementum sit diam. Nam ultricies sollicitudin placerat faucibus integer turpis euismod.
+            Libero eleifend nulla gravida justo dictumst sollicitudin libero! Pharetra hac mi egestas mi enim
+            ullamcorper.
+
+            Sed, non dis aenean nibh sollicitudin risus felis maecenas nullam. Sociis tempus consectetur torquent
+            phasellus nunc praesent. Suscipit tempor, volutpat rutrum lorem ligula tortor vitae? Imperdiet cras purus
+            tincidunt taciti lobortis netus nascetur vitae dictum tellus! Semper consectetur, faucibus tincidunt. Amet
+            hac nascetur scelerisque arcu consequat porttitor? Sem, vel eleifend dignissim mollis turpis torquent.
+            Molestie elit consectetur amet tristique netus, bibendum cras ligula? Inceptos mus.
+
+            Vel facilisi purus vitae, interdum imperdiet feugiat. Class pharetra justo neque a auctor sem turpis
+            consequat porta est rhoncus sollicitudin? Nunc libero donec dictum mattis non rhoncus. Viverra eleifend
+            eleifend felis porttitor praesent nisl cum dapibus varius euismod. Nascetur venenatis euismod velit
+            curabitur sed semper. Cras metus pharetra nunc interdum montes augue fames cursus?
+
+            Varius vehicula sem eleifend sit augue. Egestas morbi dui convallis habitasse lorem mauris enim diam
+            hendrerit maecenas sodales? Hendrerit aliquet etiam mattis tristique montes natoque taciti sit primis ipsum.
+            Mattis vestibulum hendrerit sapien. Elementum pretium aptent eros cubilia. Luctus sapien interdum primis
+            ridiculus, dignissim sed tincidunt. Placerat netus lorem erat nibh id fusce. Et dictum integer mauris est
+            fringilla mi, venenatis volutpat in et. Habitant parturient augue himenaeos nulla magna faucibus congue
+            ullamcorper habitant habitant. Vitae porttitor netus tellus nulla cubilia curae; consectetur donec lobortis
+            nam. Luctus nibh eget sit pretium volutpat sollicitudin vulputate. Suscipit quis sociosqu.
+        </h4>
+    </div>
+</body>
+
+</html>
