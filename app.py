@@ -1,53 +1,33 @@
 # Root directory of the project
 
-import keras
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import datetime
-import json
 from werkzeug.utils import secure_filename
-from flask import Flask, flash, request, redirect, url_for, render_template
+from flask import Flask, request, redirect, render_template
 from PIL import Image
 from io import BytesIO
 import base64
 import sys
 import os
-from os import listdir
-from xml.etree import ElementTree
-from numpy import zeros
-from numpy import asarray
 from numpy import expand_dims
-from numpy import mean
 
 from scripts.CarSidePrediction import YoloModel,YoloModel_dmg
 from scripts.CostPrediction import Cost_Estimate
-# Import Mask RCNN
+
+# Import Mask RCNN to find local version of library
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
 sys.path.append(ROOT_DIR)  
-# To find local version of the library
 from mrcnn.config import Config
 from mrcnn.model import MaskRCNN
-from mrcnn.utils import Dataset
-from mrcnn.utils import compute_ap
-from mrcnn.model import load_image_gt
 from mrcnn.model import mold_image
-from mrcnn.visualize import apply_mask, random_colors, display_instances
+from mrcnn.visualize import apply_mask, random_colors
 from mrcnn.utils import extract_bboxes, resize_image, resize
 from skimage.measure import find_contours
-from matplotlib import patches,  lines
+from matplotlib import patches
 from matplotlib.patches import Polygon
 import tensorflow as tf
 import io
-import cv2
-
-
-# import skimage.draw
-
-
-# from Notebook.inference import PredictionConfig, model_predict, init_model, load_weights
-
-
 
 HOME_TEMPLATE = 'index.html'
 ABOUT_TEMPLATE = 'about.html'
