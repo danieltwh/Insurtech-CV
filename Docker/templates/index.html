@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Insurtech</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/style.css') }}" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/SocietyLogo.png') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script>
+        var loadFile = function (event) {
+            var image = document.getElementById('output');
+            image.src = URL.createObjectURL(event.target.files[0]);
+        };
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="myContainer">
+            <img class="logo" src="{{ url_for('static', filename='images/SocietyLogo.png') }}" />
+            <nav>
+                <ul>
+                    <li><a href="/">Predict</a></li>
+                    <li><a href="/about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="myContainer">
+        <h2>Estimate the cost of repairing your car</h2>
+        <form method="post" action="/" enctype="multipart/form-data">
+            <p><input class="myButton" type="file" accept="image/*" name="file" id="file" onchange="loadFile(event)"
+                    autocomplete="off" required>
+            </p>
+            <p><input class="myButton" type="submit" value="Submit"></input></p>
+            <p>
+                {% if not filename %}
+                <img id="output" height="300px" />
+                {% endif %}
+            </p>
+        </form>
+        {% if filename %}
+        <div>
+            <img src={{pred}} height="400px">
+            <img src={{yolo_pred}} height="400px">
+        </div>
+        {% endif %}
+
+        {% if filename %}
+        <div>
+            <p>{{total_cost}}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+
+</html>
