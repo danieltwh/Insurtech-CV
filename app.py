@@ -21,7 +21,7 @@ from numpy import expand_dims
 from numpy import mean
 
 from scripts.CarSidePrediction import YoloModel,YoloModel_dmg
-from scripts.CostPrediction import Cost_Estimate
+from scripts.CostPrediction import Cost_Estimate, Cost_Estimate_YOLO
 # Import Mask RCNN
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
 sys.path.append(ROOT_DIR)  
@@ -257,8 +257,8 @@ def upload_image():
         _, processed_dmg, coords_dmg = damage_model.predict_single(image)
 
         # Printing coords to show correctness
-        print(coords)
-        print(coords_dmg)
+        # print(coords)
+        # print(coords_dmg)
         yolo_pil_img = Image.fromarray(processed_dmg)
         yolo_rawBytes = io.BytesIO()
         yolo_pil_img.save(yolo_rawBytes, "JPEG")
@@ -272,13 +272,13 @@ def upload_image():
         # Getting the estimated cost for MaskRCNN
         total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
 
-        print(pred_mask)
-        print(pred_class_id)
+        # print(pred_mask)
+        # print(pred_class_id)
 
-        # Getting the estimated cost for MaskRCNN
-        #total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
+        # Getting the estimated cost for Yolo
+        yolo_total_cost = Cost_Estimate_YOLO(coords, pred_mask, pred_class_id, image)
 
-        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = total_cost, yolo_pred=yolo_uri)
+        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:
         return redirect(request.url)
 
