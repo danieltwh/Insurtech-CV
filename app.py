@@ -205,18 +205,12 @@ def upload_image():
         yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
 
         # Getting estimated costs
-<<<<<<< HEAD
         print(list(damageSegments))
         total_cost = costEstimate(coords, damageSegments, image) # TODO: Fix bug
         yolo_total_cost = costEstimate(coords, coords_dmg, image)
 
         print(total_cost)
         print(yolo_total_cost)
-=======
-        total_cost = Cost_Estimate(coords, pred_mask, pred_names, image)
-        # yolo_total_cost = Cost_Estimate_YOLO(coords, coords_dmg, pred_names, image)
-        yolo_total_cost = Cost_Estimate_YOLO(coords, pred_mask, pred_names, image)
->>>>>>> a65215280c91db4f99738e75c9288944396cf90c
 
         return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:
