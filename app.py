@@ -12,6 +12,7 @@ import os
 
 from scripts.NewCarSidePrediction import CarSideModel
 from scripts.NewDamagePrediction import DamageDetectionModel, DamageSegmentationModel
+from scripts.CostPrediction import Cost_Estimate, Cost_Estimate_YOLO
 
 # Import Mask RCNN to find local version of library
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
@@ -207,14 +208,10 @@ def upload_image():
         yolo_mime = "yolo_image/jpeg"
         yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
 
-        # Getting the estimated cost for MaskRCNN
-        # total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
-
-        # print(pred_mask)
-        # print(pred_class_id)
-
-        # Getting the estimated cost for Yolo
-        yolo_total_cost = Cost_Estimate_YOLO(coords, pred_mask, pred_class_id, image)
+        # Getting estimated costs
+        total_cost = Cost_Estimate(coords, pred_mask, pred_names, image)
+        # yolo_total_cost = Cost_Estimate_YOLO(coords, coords_dmg, pred_names, image)
+        yolo_total_cost = "NOT DONE!"
 
         return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:

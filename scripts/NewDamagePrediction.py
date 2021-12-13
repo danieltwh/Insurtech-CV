@@ -28,9 +28,9 @@ class DamageSegmentationPrediction(MrcnnPrediction):
         if name == 0: 
             self.name = "BG"
         elif name == 1: 
-            self.name = "scratches"
+            self.name = "Scratches"
         elif name == 2: 
-            self.name = "dents"
+            self.name = "Dents"
         else: 
             self.name = None
 
