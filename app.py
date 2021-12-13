@@ -12,7 +12,7 @@ import os
 
 from scripts.NewCarSidePrediction import CarSideModel
 from scripts.NewDamagePrediction import DamageDetectionModel, DamageSegmentationModel
-from scripts.CostPrediction import Cost_Estimate, Cost_Estimate_YOLO
+from scripts.CostPrediction import costEstimate
 
 # Import Mask RCNN to find local version of library
 ROOT_DIR = os.path.abspath("./Mask_RCNN")
@@ -24,6 +24,7 @@ from matplotlib import patches
 from matplotlib.patches import Polygon
 import tensorflow as tf
 import io
+from copy import deepcopy
 
 HOME_TEMPLATE = 'index.html'
 ABOUT_TEMPLATE = 'about.html'
@@ -85,10 +86,10 @@ def getArrayToPlot(image, boxes, masks, class_names,
         if not np.any(boxes[i]):
             # Skip this instance. Has no bbox. Likely lost in image cropping.
             continue
-        x1 = boxes[i].xmin # ["xmin"]
-        x2 = boxes[i].xmax # ["xmax"]
-        y1 = boxes[i].ymin # ["ymin"]
-        y2 = boxes[i].ymax # ["ymax"]
+        x1 = boxes[i].xmin
+        x2 = boxes[i].xmax
+        y1 = boxes[i].ymin
+        y2 = boxes[i].ymax
         if show_bbox:
             p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
                                 alpha=0.7, linestyle="dashed",
@@ -160,23 +161,25 @@ def upload_image():
         image_np = np.array(image)
         image = resize_image_array(image_np)
         
-        #Mask_RCNN predict       
+        # Model predictions
+        _, processed_carside, coords = carSideModel.predict_single(image)
+        _, processed_dmg, coords_dmg = damageDetectModel.predict_single(image)
         with graph.as_default():
             _, _, predictions = damageSegmentModel.predict_single(image)
+            _, _, damageSegments = damageSegmentModel.predict_single(image) # Hack because there's a mutation somewhere... TODO: Find the mutation
 
+        # Post processing for MRCNN
         pred_dict = {"bbox": [], "mask": [], "name": [], "score": []}        
         for prediction in predictions:
             pred_dict["bbox"].append(prediction.getBoundingBox())
             pred_dict["mask"].append(prediction.getMask())
             pred_dict["name"].append(prediction.getName())
             pred_dict["score"].append(prediction.getConfidence())
-
         pred_bbox = pred_dict["bbox"]
         pred_mask = pred_dict["mask"]
         pred_names = pred_dict["name"]
         pred_conf = pred_dict["score"]
-
-        output = getArrayToPlot(image, pred_bbox, pred_mask, pred_names, scores=pred_conf)
+        output = getArrayToPlot(processed_carside, pred_bbox, pred_mask, pred_names, scores=pred_conf) # Use 'image' to show Yolo damage prediction here also
 
         scale = 0.5
         h,w = output.shape[:2]
@@ -184,6 +187,8 @@ def upload_image():
         output = resize(output, (round(h * scale), round(w * scale)), preserve_range=True)
         output = output.astype(image_dtype) # Convert back to original image type
         pil_img = Image.fromarray(output) # Convert to PIL image
+
+        # Save Image
         rawBytes = io.BytesIO()
         pil_img.save(rawBytes, "JPEG")
         rawBytes.seek(0)
@@ -191,15 +196,6 @@ def upload_image():
         mime = "image/jpeg"
         uri = "data:%s;base64,%s"%(mime, img_base64)
 
-        # Yolo model predict
-        _, _, coords = carSideModel.predict_single(image)
-
-        # Yolo model predict (Damage)
-        _, processed_dmg, coords_dmg = damageDetectModel.predict_single(image)
-
-        # Printing coords to show correctness
-        # print(coords)
-        # print(coords_dmg)
         yolo_pil_img = Image.fromarray(processed_dmg)
         yolo_rawBytes = io.BytesIO()
         yolo_pil_img.save(yolo_rawBytes, "JPEG")
@@ -209,9 +205,12 @@ def upload_image():
         yolo_uri = "data:%s;base64,%s"%(yolo_mime, yolo_img_base64)
 
         # Getting estimated costs
-        total_cost = Cost_Estimate(coords, pred_mask, pred_names, image)
-        # yolo_total_cost = Cost_Estimate_YOLO(coords, coords_dmg, pred_names, image)
-        yolo_total_cost = "NOT DONE!"
+        print(list(damageSegments))
+        total_cost = costEstimate(coords, damageSegments, image) # TODO: Fix bug
+        yolo_total_cost = costEstimate(coords, coords_dmg, image)
+
+        print(total_cost)
+        print(yolo_total_cost)
 
         return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:
