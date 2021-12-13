@@ -197,8 +197,8 @@ def upload_image():
         _, processed_dmg, coords_dmg = damageDetectModel.predict_single(image)
 
         # Printing coords to show correctness
-        print(coords)
-        print(coords_dmg)
+        # print(coords)
+        # print(coords_dmg)
         yolo_pil_img = Image.fromarray(processed_dmg)
         yolo_rawBytes = io.BytesIO()
         yolo_pil_img.save(yolo_rawBytes, "JPEG")
@@ -213,11 +213,10 @@ def upload_image():
         # print(pred_mask)
         # print(pred_class_id)
 
-        # Getting the estimated cost for MaskRCNN
-        #total_cost = Cost_Estimate(coords, pred_mask, pred_class_id, image)
+        # Getting the estimated cost for Yolo
+        yolo_total_cost = Cost_Estimate_YOLO(coords, pred_mask, pred_class_id, image)
 
-        # TODO: total_cost
-        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost = 0, yolo_pred=yolo_uri)
+        return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:
         return redirect(request.url)
 

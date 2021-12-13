@@ -61,6 +61,8 @@ def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
     total_cost = (0, 0)
 
     for key, val in location_with_damages.items():
+        if len(val) == 0:
+            break
         temp = max(list(map(lambda x: damage_to_cost[x], val)))
         total_cost = tuple(map(sum, zip(total_cost, temp)))
 
@@ -128,6 +130,8 @@ def Cost_Estimate_YOLO(loc_coords, damage_mask, pred_class_id, image):
     total_cost = (0, 0)
 
     for key, val in location_with_damages.items():
+        if len(val) == 0:
+            break
         temp = max(list(map(lambda x: damage_to_cost[x], val)))
         total_cost = tuple(map(sum, zip(total_cost, temp)))
 
