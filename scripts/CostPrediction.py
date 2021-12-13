@@ -1,21 +1,24 @@
 import cv2 as cv
 import numpy as np
 
-def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
+from typing import List
+from scripts.predictions.YoloPrediction import YoloPrediction
+from scripts.predictions.MrcnnPrediction import MrcnnPrediction
+from scripts.typedefs import Mask, Image
+
+def Cost_Estimate(loc_coords: List[MrcnnPrediction], damage_mask: List[Mask], pred_names: List[str], image: Image):
     location_mask = {}
     location_confidence = {}
-    height, width, col = image.shape
-    for loc in list(eval(loc_coords)):
-        curr_name = loc["name"]
-        curr_confidence = loc["confidence"]
-
-        # print(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])
-        # print(h, w)
+    height, width, _ = image.shape
+    for loc in loc_coords:
+        curr_name = loc.getName()
+        curr_confidence = loc.getConfidence()
 
         if curr_name not in location_confidence or location_confidence.get(curr_name) < curr_confidence:
             mask = np.zeros((height, width))
 
-            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])))
+            bbox = loc.getBoundingBox()
+            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax)))
 
             mask = cv.rectangle(mask, (xmin, ymin), (xmax, ymax), color=(1, 1, 1), thickness=-1)
 
@@ -27,12 +30,8 @@ def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
     for key, val in location_mask.items():
         location_with_damages[key] = []
 
-    tracker = 0
-    damage = ["BG", "Scratches", "Dents"]
-    for damage_pred in pred_class_id:
-        damage_name = damage[damage_pred]
-        mask = np.copy(damage_mask[:, :, tracker])
-        tracker += 1
+    for i, damage_name in enumerate(pred_names):
+        mask = np.copy(damage_mask[i])
 
         curr_area = np.count_nonzero(mask)
         # print(damage_name, curr_area)
@@ -44,14 +43,11 @@ def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
             combined = mask + mask2
             intersect = np.sum(np.where(combined==2, 1, 0))
             intersect_area = intersect / curr_area
-            # print(location, intersect_area)
             if intersect_area > max_intersect_area or (max_intersect_area == 0 and intersect_area == 0):
                 damage_loc = location
                 max_intersect_area = intersect_area
 
         location_with_damages[damage_loc].append(damage_name)
-
-    # print(location_with_damages)
 
     damage_to_cost = {
         "Scratches" : (200, 400),
@@ -70,41 +66,47 @@ def Cost_Estimate(loc_coords, damage_mask, pred_class_id, image):
     return total_cost
 
 # yet to edit
-def Cost_Estimate_YOLO(loc_coords, damage_mask, pred_class_id, image):
+def Cost_Estimate_YOLO(loc_coords: List[YoloPrediction], dmg_coords: List[YoloPrediction], pred_names: List[str], image: Image):
     location_mask = {}
     location_confidence = {}
-    height, width, col = image.shape
-    for loc in list(eval(loc_coords)):
-        curr_name = loc["name"]
-        curr_confidence = loc["confidence"]
-
-        # print(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])
-        # print(h, w)
+    height, width, _ = image.shape
+    for loc in loc_coords:
+        curr_name = loc.getName()
+        curr_confidence = loc.getConfidence()
 
         if curr_name not in location_confidence or location_confidence.get(curr_name) < curr_confidence:
             mask = np.zeros((height, width))
-
-            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(loc["xmin"], loc["ymin"], loc["xmax"], loc["ymax"])))
+            bbox = loc.getBoundingBox()
+            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax)))
 
             mask = cv.rectangle(mask, (xmin, ymin), (xmax, ymax), color=(1, 1, 1), thickness=-1)
 
             location_mask[curr_name] = mask
             location_confidence[curr_name] = curr_confidence
+    
+    damage_mask = {}
+    for loc in dmg_coords:
+        curr_name = loc.getName()
+        curr_confidence = loc.getConfidence()
+
+        if curr_name not in location_confidence or location_confidence.get(curr_name) < curr_confidence:
+            mask = np.zeros((height, width))
+            bbox = loc.getBoundingBox()
+            xmin, ymin, xmax, ymax = tuple(map(lambda x: int(np.float32(x)),(bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax)))
+
+            mask = cv.rectangle(mask, (xmin, ymin), (xmax, ymax), color=(1, 1, 1), thickness=-1)
+
+            damage_mask[curr_name] = mask
 
     location_with_damages = {} 
 
     for key, val in location_mask.items():
         location_with_damages[key] = []
 
-    tracker = 0
-    damage = ["BG", "Scratches", "Dents"]
-    for damage_pred in pred_class_id:
-        damage_name = damage[damage_pred]
-        mask = np.copy(damage_mask[:, :, tracker])
-        tracker += 1
+    for i, damage_name in enumerate(pred_names):
+        mask = np.copy(damage_mask[damage_name])
 
         curr_area = np.count_nonzero(mask)
-        # print(damage_name, curr_area)
 
         damage_loc = ""
         max_intersect_area = 0
