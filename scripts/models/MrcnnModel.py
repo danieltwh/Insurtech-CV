@@ -50,14 +50,14 @@ class MrcnnModel(Model[T]):
             rois = detection["rois"]
             class_ids = detection["class_ids"]
             scores = detection["scores"]
-            masks: List[Mask] = detection["masks"]
+            masks: np.ndarray[Mask] = np.array(detection["masks"])
             bboxes = extract_bboxes(masks)
 
             prediction = []
             for i, class_id in enumerate(class_ids):
                 score = scores[i]
                 bbox = self._extractBboxes(detection=bboxes[i])
-                mask = masks[i]
+                mask = masks[:, :, i]
                 prediction.append(MrcnnPrediction(mask, bbox, score, class_id))
             predictions.append(prediction)
 
