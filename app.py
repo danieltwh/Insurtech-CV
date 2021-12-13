@@ -211,7 +211,7 @@ def upload_image():
         # Getting estimated costs
         total_cost = Cost_Estimate(coords, pred_mask, pred_names, image)
         # yolo_total_cost = Cost_Estimate_YOLO(coords, coords_dmg, pred_names, image)
-        yolo_total_cost = "NOT DONE!"
+        yolo_total_cost = Cost_Estimate_YOLO(coords, pred_mask, pred_names, image)
 
         return render_template(HOME_TEMPLATE, filename=filename, pred=uri, total_cost=total_cost, yolo_total_cost=yolo_total_cost, yolo_pred=yolo_uri)
     else:
