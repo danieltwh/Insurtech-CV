@@ -12,6 +12,8 @@ from mrcnn.config import Config
 from mrcnn.model import MaskRCNN, mold_image
 from mrcnn.utils import extract_bboxes
 
+import tensorflow as tf
+
 T = TypeVar("T", bound=MrcnnPrediction)
 class MrcnnModel(Model[T]):
     class PredictionConfig(Config):
@@ -34,8 +36,16 @@ class MrcnnModel(Model[T]):
         iou : float = kwargs["iou"]  if "iou" in kwargs else 0.3    # NMS IoU threshold [0., 1.]
 
         self.cfg = self.PredictionConfig(conf, iou)
-        self.model = MaskRCNN(mode="inference", model_dir="./", config=self.cfg)
-        self.model.load_weights(path, by_name=True)
+
+        # To handle multiple threads
+        self.session = tf.Session()
+        self.graph = tf.get_default_graph()
+
+        with self.graph.as_default():
+            with self.session.as_default():
+                self.model = MaskRCNN(mode="inference", model_dir="./", config=self.cfg)
+                self.model.load_weights(path, by_name=True)
+
 
     def _extractBboxes(self, detection: List) -> BoundingBox:
         return BoundingBox(detection[1], detection[0], detection[3], detection[2])
@@ -43,11 +53,14 @@ class MrcnnModel(Model[T]):
     def predict_batch(self, imgs:List[Image]) ->  Tuple[Image, Image, List[List[T]]]:
         original_imgs = np.stack(imgs, axis=0 )
         scaled_imgs = mold_image(original_imgs, self.cfg)
-        detections = self.model.detect(scaled_imgs, 0)
+
+        with self.graph.as_default():
+            with self.session.as_default():
+                detections = self.model.detect(scaled_imgs, 0)
 
         predictions = []
         for detection in detections:
-            rois = detection["rois"]
+            _ = detection["rois"]
             class_ids = detection["class_ids"]
             scores = detection["scores"]
             masks: np.ndarray[Mask] = np.array(detection["masks"])

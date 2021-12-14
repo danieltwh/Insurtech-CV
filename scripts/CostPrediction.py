@@ -69,7 +69,7 @@ def costEstimate(locList: List[CarSidePrediction], damageList: List[Union[Damage
     for _, damageList in location_with_damages.items():
         if len(damageList) == 0:
             continue
-        temp = max(list(map(lambda damage: damage_to_cost[damage.getName()], damageList)))
+        temp = max([(0, 0)] + list(map(lambda damage: damage_to_cost[damage.getName()], damageList)))
         total_cost = tuple(map(sum, zip(total_cost, temp)))
 
     total_cost = f"${total_cost[0]} - ${total_cost[1]}"
