@@ -10,6 +10,14 @@ body {
   margin: 0 auto;
 }
 
+.horizontalContainer {
+  display: flex;
+}
+
+.horiFlex {
+  flex-direction: row;
+}
+
 header {
   background: #f2ebe9;
 }

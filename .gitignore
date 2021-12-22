@@ -1,12 +1,13 @@
+# Development files
+.vscode
+__pycache__/
+__init__.py
 *.pyc
-Notebook/yolov5_1/YoloAnnotation
-Notebook/mask_rcnn_damage_0010.h5
-__pycache__/
-MASK_RCNN/mrcnn/__pycache__/
-__pycache__/
-*.h5
 
-scripts/best.h5
+# Other files
+development/Notebook/yolov5_1/YoloAnnotation
+Mask_RCNN/**
 
-Mask_RCNN/
+# Model weights
 *.h5
+*.pt
