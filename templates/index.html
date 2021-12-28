@@ -12,6 +12,19 @@
             image.src = URL.createObjectURL(event.target.files[0]);
         };
     </script>
+    <script>
+        var show_loading = function () {
+            $("#loading").show();
+        }
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('input.submit').submit(function(){
+                show_loading();
+            });
+            });
+    </script>
+    
 </head>
 
 <body>
@@ -26,14 +39,20 @@
             </nav>
         </div>
     </header>
-    <div class="myContainer">
+    <div class="centeredContainer">
         <h2>Estimate the cost of repairing your car</h2>
         <form method="post" action="/" enctype="multipart/form-data">
             <p><input class="myButton" type="file" accept="image/jpg, image/jpeg" name="file" id="file" onchange="loadFile(event)"
                     autocomplete="off" required>
             </p>
-            <p><input class="myButton" type="submit" value="Submit"></input></p>
+            <p><input id="submit" class="myButton" type="submit" value="Submit" onclick="show_loading()"></input></p>
         </form>
+        
+        <div id="loading" style="display:none">
+            Loading... This might take around 15 seconds...
+        </div>
+        
+        
         {% if filename %}
         <div class="horizontalContainer">
             <div class="horiFlex">
