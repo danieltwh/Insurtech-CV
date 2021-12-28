@@ -27,38 +27,169 @@
         </div>
     </header>
     <div class="myContainer">
-        <h4>Donec facilisi magna curabitur suscipit lectus maecenas sapien. Faucibus mus mus cras ultrices. Maecenas
-            tincidunt vestibulum sodales elementum mus venenatis praesent quam tellus est. Laoreet imperdiet, sagittis
-            lorem platea per. Euismod, dis dictum erat etiam congue scelerisque. Fames hendrerit commodo luctus ut
-            libero, taciti eget. Magnis ac dignissim dignissim nascetur accumsan mi dis felis velit. Nulla odio
-            volutpat.
-
-            Amet lobortis taciti non duis arcu! Sem dictumst enim primis ligula amet ut neque erat dignissim iaculis
-            ornare. Blandit lacus interdum porta. Per fringilla sed neque conubia. Parturient penatibus eget non rhoncus
-            aliquam pulvinar elementum sit diam. Nam ultricies sollicitudin placerat faucibus integer turpis euismod.
-            Libero eleifend nulla gravida justo dictumst sollicitudin libero! Pharetra hac mi egestas mi enim
-            ullamcorper.
-
-            Sed, non dis aenean nibh sollicitudin risus felis maecenas nullam. Sociis tempus consectetur torquent
-            phasellus nunc praesent. Suscipit tempor, volutpat rutrum lorem ligula tortor vitae? Imperdiet cras purus
-            tincidunt taciti lobortis netus nascetur vitae dictum tellus! Semper consectetur, faucibus tincidunt. Amet
-            hac nascetur scelerisque arcu consequat porttitor? Sem, vel eleifend dignissim mollis turpis torquent.
-            Molestie elit consectetur amet tristique netus, bibendum cras ligula? Inceptos mus.
-
-            Vel facilisi purus vitae, interdum imperdiet feugiat. Class pharetra justo neque a auctor sem turpis
-            consequat porta est rhoncus sollicitudin? Nunc libero donec dictum mattis non rhoncus. Viverra eleifend
-            eleifend felis porttitor praesent nisl cum dapibus varius euismod. Nascetur venenatis euismod velit
-            curabitur sed semper. Cras metus pharetra nunc interdum montes augue fames cursus?
-
-            Varius vehicula sem eleifend sit augue. Egestas morbi dui convallis habitasse lorem mauris enim diam
-            hendrerit maecenas sodales? Hendrerit aliquet etiam mattis tristique montes natoque taciti sit primis ipsum.
-            Mattis vestibulum hendrerit sapien. Elementum pretium aptent eros cubilia. Luctus sapien interdum primis
-            ridiculus, dignissim sed tincidunt. Placerat netus lorem erat nibh id fusce. Et dictum integer mauris est
-            fringilla mi, venenatis volutpat in et. Habitant parturient augue himenaeos nulla magna faucibus congue
-            ullamcorper habitant habitant. Vitae porttitor netus tellus nulla cubilia curae; consectetur donec lobortis
-            nam. Luctus nibh eget sit pretium volutpat sollicitudin vulputate. Suscipit quis sociosqu.
-        </h4>
+        <h1>
+            About Us
+        </h1>
+        <h2>
+            Car Claims Insurance Technology by NUS Fintech Society
+        </h2>
+        <p>
+            Hi there, we are students from NUS Fintech Society. Our team consists of <a href="https://github.com/Amadeus-Winarto">Amadeus</a>, <a href="https://github.com/danieltwh">Daniel</a>, <a href="https://github.com/ChesterWongz">Chester</a>, <a href="https://github.com/Nielsencu">Nielsen</a> and <a href="https://github.com/ngzhili">Zhili</a>. 
+            In this project, we sought to train a computer vision model to detect the location and severity of car damages in order to give an estimate of the cost of repairs, which could help insurance firms process claims faster and detect fraudulent claims. This article summarises our project and our key takeaways, which we hope would help you in developing your own computer vision project.
+        </p>
+        <h3>
+            Problem Statement
+        </h3>
+        <p>
+            Insurance claims process is a long and tedious process which requires manual checking of claims filed by clients. This is especially evident in the car insurance space where  many manual car insurance claims take days or weeks to process. Why is this so? This is because for a claim to be processed,  trained mechanics are required to evaluate damages for every car inspected which lengthens the entire claiming process. Moreover, evaluating the severity of the damage could be subjective among different inspectors. Hence, an automated damage detection system could help to make insurance claims process fairer, faster and more efficient.
+            
+        </p>
+        <h3>
+            Objective of Project
+        </h3>
+        <p>
+            In this project, the team aimed to develop a computer vision model to detect the location and severity of car damages in order to give an estimate of the cost of repairs. To do so, we built computer vision models to detect the location and the type of damage. 
+            <br/>
+            The final product was a website that allows users to upload an image of their damaged car to obtain an estimate of the cost of repairs. The figure below shows the data flow of our end product.
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/DataFlowOfEndProduct.png') }}" width="700px"/>
+            <figcaption>
+                <i>Data Flow of End-product</i>
+            </figcaption>
+        </div>
+            <h3>
+                Dataset
+            </h3>
+        <p>
+            For the model training, we gathered around 140 images of damaged cars with either scratches or dents.
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/SampleImagesFromDataset.png') }}" width="700px"/>
+            <figcaption>
+                <i>Sample Images from our Dataset</i>
+            </figcaption>
+        </div>
+        <p>
+            To train the damage detection model, we identified scratches and dents in images and labeled them with VGG Image Annotator. Below is the number of scratches and dents labels in our dataset.
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/CountOfScratchesAndDents.png') }}" width="400px"/>
+            <figcaption>
+                <i>Count of Scratches and Dent Labels in Dataset</i>
+            </figcaption>
+        </div>
+        <h3>
+            Training Process
+        </h3>
+        <h3>
+            Mask-RCNN Damage Detection
+        </h3>
+        <p>
+            For the training of the model, we fine-tuned a Mask R-CNN Model that was trained on the MS COCO object detection problem as a starting point to finetune the model with our dataset of damaged cars. We first trained the model on 3 classes, namely scratches, moderate dents, and severe dents for around 70 epochs on the heads layer and 50 epochs on all layers. The model performed very poorly with 16.6% test mAP.
+            
+            With a very small dataset at around 140 images, we decided to augment our images to add more variety to the dataset. This helps the model in capturing some of the patterns under different angles, different lighting conditions and different image resolutions.
+        </p>
+        <div class="centeredContainer">
+            <div class="horizontalContainer">
+                <div class="horiFlex">
+                    <img src="{{ url_for('static', filename='images/RawTrainingData.png') }}" width="350px"/>
+                </div>
+                <div class="horiFlex">
+                    <img src="{{ url_for('static', filename='images/AugmentedTrainingData.png') }}" width="350px"/>
+                </div>
+            </div>
+            <figcaption>
+                <i>Raw Training Data (Left) vs Augmented Training Data (Right)</i>
+            </figcaption>
+        </div>
+        <p>
+            We also decided to merge two classes into one class as we realised we only had very few examples of the other class and thus the model was not able to capture the patterns of that class properly. After utilising image augmentation and reducing the prediction classes, we trained all of the layers for another 50 epochs. It showed significant improvements where the test mAP rose to 50%. After observing the validation loss fluctuating, we decided not to continue training as we suspect the model to overfit to the training data. We then used the best model weight that achieved 50% test mAP for the model deployed on our website.
+        </p>
+        <h3>
+            YoloV5 Damage Detection
+        </h3>
+        <p>
+            After cloning the YOLOv5 repo from ultralytics, we have 5 versions of the model: YOLOv5n, YOLOv5s, YOLOv5m, YOLOv5l and, YOLOv5x. You can clone the repo <a href="https://github.com/ultralytics/yolov5">here</a>.
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/ValidationVsInferenceTime.png') }}" width="700px"/>
+            <figcaption>
+                <i>Yolov5 Model Benchmark for COCO AP validation vs Inference Time</i>
+            </figcaption>
+        </div>
+        <p>            
+            When training for Yolov5, there’s four different pretrained object detection weight sizes. As the model’s weight size increases, there is an increase in the mAP value at the expense of inference time. We then trained on three weight sizes namely small, medium and large, all with 300 epochs, and we found that the weight size that yielded the highest overall mAP was the Yolov5 small.
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/YoloTrainingLog.png') }}" width="700px"/>
+            <figcaption>
+                <i>Training Log Results for Yolov5s model</i>
+            </figcaption>
+        </div>        
+        <p>
+            From the training results above, we can see that the model begins to show signs of overfitting after 100 epochs where the validation loss starts to increase while training loss continues to decrease. Thus, we obtain the best model weights at 100 epoch (best mAP).
+        </p>
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/InferenceResults.png') }}" width="700px"/>
+            <figcaption>
+                <i>Inference Results on validation dataset</i>
+            </figcaption>
+        </div>  
+        <div class="centeredContainer">
+            <img src="{{ url_for('static', filename='images/ConfusionMatrix.png') }}" width="700px"/>
+            <figcaption>
+                <i>Confusion matrix for validation dataset</i>
+            </figcaption>
+        </div>              
+        <p>            
+            Fortunately, as low inference time is not a priority in our application, we decided to use the weight from the fine-tuned Yolov5 small for our website as it achieved the best results in terms of accuracy and speed.
+        </p>
+        <h3>
+            YoloV5 Location Detection
+        </h3>
+        <p>
+            For the location detection, we trained another Yolov5 model on 3 classes, namely front, back and side.  We did not train location detection using Mask R-CNN as we only needed to know whether the damages are front, side or back and hence instance segmentation was not really necessary. These pictures show some of the results of the location detection performed on some damaged cars.
+        </p>
+        <div class="centeredContainer">
+            <div class="horizontalContainer">
+                <div class="horiFlex">
+                    <img src="{{ url_for('static', filename='images/EndResult1.png') }}" width="350px"/>
+                </div>
+                <div class="horiFlex">
+                    <img src="{{ url_for('static', filename='images/EndResult2.png') }}" width="350px"/>
+                </div>
+            </div>
+            <figcaption>
+                <i>End Results from flask web application</i>
+            </figcaption>
+        </div> 
+        <h3>
+            Deployment
+        </h3>
+        <p>            
+            Using Flask and REST API, we integrated the MaskRCNN and YOLOv5 models into a web application that enables end users to upload car images and receive model inference results.
+        </p>
+        <h3>
+            Machine learning model serving
+        </h3>
+        <p>
+            We tried to deploy our web application directly via Heroku API. However, due to the free tier 500mb slug size of Heroku, we are unable to directly deploy the web application to Heroku via git. Since Heroku does not have limitations of Docker Image size for free tier, we tried to work around the problem by containerizing our application using Docker. Subsequently, we pushed the images to heroku remote git repo and released the web application. By calling the webpage, our ram usage has exceeded the free tier dyno memory quota of 512mb which resulted in the force kill of the dyno (R15 error).
+        </p>
+        <h3>
+            Learnings
+        </h3>
+        <p>
+            We learnt that computer vision models require heavy computational resources for training and inference. An alternative is to train tensorflow object detection models compatible with tensorflow.js for client side prediction and utilising the end user’s local machine resources. 
+        </p>
+        <p>
+            In addition, we also realised the importance of large, quality datasets to achieve reasonable accuracy with complex deep learning models. In our case, we initially set out to train the models to detect the severity of damages for dents and scratches. However, our dataset only consists of 140 images, which is quite limited, and contains damages with approximately the same level of severity. As a result, we were only able to achieve reasonable accuracy when training our models to detect the presence of dents and scratches. Stratifying  each damage class based on severity led to drastic deterioration in the accuracy of the models. Therefore, having a large dataset, with varying severity and classes of damages, is paramount to better performing models that would perhaps deliver greater value to businesses.
+        </p>
+        <p>
+            Thanks for reading! Check out our <a href="https://github.com/danieltwh/Insurtech-CV">Github Repo</a>!
+        </p>
     </div>
+    <br>
 </body>
 
 </html>
