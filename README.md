@@ -59,6 +59,16 @@
 
 ## Usage
 
+### Demo
+
+Video Demo of Flask Application
+
+1. Select and upload an image from your local machine.
+2. Submit image for inference.
+3. Predicted instance segmentation masks, bounding boxes and estimated costs results will be displayed in the web interface.
+
+https://user-images.githubusercontent.com/69728128/147458137-d8ec2fb8-a20c-4b90-9003-0f1e646ce93d.mp4
+
 ### Training and Testing
 
 Jupyter notebooks are provided in the `development` folder.

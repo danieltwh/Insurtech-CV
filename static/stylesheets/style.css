@@ -5,6 +5,10 @@ body {
   font-weight: 600;
 }
 
+.centeredContainer {
+  text-align: center;
+}
+
 .myContainer {
   width: 80%;
   margin: 0 auto;
@@ -12,6 +16,7 @@ body {
 
 .horizontalContainer {
   display: flex;
+  justify-content: center;
 }
 
 .horiFlex {
