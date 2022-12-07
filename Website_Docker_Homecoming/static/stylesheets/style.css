@@ -1,0 +1,110 @@
+body {
+  margin: 0;
+  background: #eddcd9;
+  font-family: sans-serif;
+  font-weight: 600;
+}
+
+.centeredContainer {
+  text-align: center;
+}
+
+.myContainer {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.horizontalContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.horiFlex {
+  flex-direction: row;
+}
+
+header {
+  background: #f2ebe9;
+}
+
+header::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.logo {
+  float: left;
+  margin: -20px 0px;
+  height: 100px;
+}
+
+nav {
+  float: right;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav li {
+  display: inline-block;
+  margin-left: 70px;
+  padding-top: 23px;
+
+  position: relative;
+}
+
+nav a {
+  color: #264143;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #de5499;
+}
+
+nav a::before {
+  content: "";
+  display: block;
+  height: 5px;
+  background-color: #264143;
+
+  position: absolute;
+  top: 0;
+  width: 0%;
+
+  transition: all ease-in-out 250ms;
+}
+
+nav a:hover::before {
+  width: 100%;
+}
+
+.myButton {
+  box-shadow: inset 0px 1px 0px 0px #f2ebe9;
+  background: linear-gradient(to bottom, #f2ebe9 5%, #f6f6f6 100%);
+  background-color: #e99f4c;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  display: inline-block;
+  cursor: pointer;
+  color: #264143;
+  font-weight: bold;
+  padding: 6px 24px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #f2ebe9;
+}
+
+.myButton:hover {
+  background: linear-gradient(to bottom, #f6f6f6 5%, #f2ebe9 100%);
+  background-color: #e99f4c;
+}
+.myButton:active {
+  position: relative;
+  top: 1px;
+}
